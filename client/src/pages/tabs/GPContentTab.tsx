@@ -157,8 +157,6 @@ function NetworkMapContent() {
 /* ---- Spoke Card for GP in hub visualization ---- */
 function GPSpokeCard({ gp }: { gp: typeof gpProfiles[0] }) {
   const textColor = gpTextColor(gp.gpColor);
-  const base = import.meta.env.BASE_URL.replace(/\/$/, "") || "";
-
   return (
     <div
       className="rounded-lg overflow-hidden transition-all hover:shadow-lg"
@@ -186,7 +184,7 @@ function GPSpokeCard({ gp }: { gp: typeof gpProfiles[0] }) {
         <div className="flex items-center justify-between">
           <Badge variant="gold">{gp.cadence}</Badge>
           <Link
-            href={`${base}/gp/${gp.slug}`}
+            href={`/gp/${gp.slug}`}
             className="inline-flex items-center gap-1 text-[11px] font-medium transition-colors"
             style={{ color: gold }}
           >

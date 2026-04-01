@@ -73,7 +73,6 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
-  const base = import.meta.env.BASE_URL.replace(/\/$/, "") || "";
   const textColor = gpTextColor(gp.gpColor);
   const mutedColor = gpMutedTextColor(gp.gpColor);
   const subtleColor = gpSubtleTextColor(gp.gpColor);
@@ -153,7 +152,7 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
         {/* Back link */}
         <div className="p-6 pb-4">
           <Link
-            href={`${base}/`}
+            href={"/"}
             className="inline-flex items-center gap-2 text-xs font-medium transition-colors"
             style={{ color: subtleColor }}
             onClick={() => {
@@ -254,7 +253,7 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
           <div className="max-w-3xl">
             {/* Back link (desktop, visible in content area too) */}
             <Link
-              href={`${base}/`}
+              href={"/"}
               className="hidden lg:inline-flex items-center gap-2 text-xs font-medium mb-8 transition-colors"
               style={{ color: subtleColor }}
             >
