@@ -1,10 +1,13 @@
+import { useState } from "react";
 import {
-  competitorDensity,
+  competitors,
+  categories,
   scrubComparison,
   swotData,
   positioningMatrix,
   whitespaceEvidence,
   competitiveKeyTakeaway,
+  type CompetitorProfile,
 } from "@/lib/competitiveData";
 import {
   SectionHeader,
@@ -15,44 +18,110 @@ import {
   Badge,
   DataTable,
   HighlightBlock,
+  InfoRow,
 } from "@/components/BrandComponents";
-import SubTabNav from "@/components/SubTabNav";
+import SubTabNav, { ExpandableCard } from "@/components/SubTabNav";
 import { Shield, Swords, Grid3X3, Crosshair, Target } from "lucide-react";
 
 const gold = "var(--phycap-gold)";
+const forest = "var(--phycap-forest)";
 
 function ThreatBadge({ level }: { level: string }) {
   const variant = level === "High" ? "red" : level === "Medium" ? "amber" : level === "Low-Medium" ? "amber" : "green";
   return <Badge variant={variant}>{level}</Badge>;
 }
 
+function CompetitorCard({ c }: { c: CompetitorProfile }) {
+  return (
+    <ExpandableCard
+      title={c.name}
+      subtitle={`"${c.positioning}"`}
+      badge={<ThreatBadge level={c.threatLevel} />}
+    >
+      <div className="space-y-3">
+        {/* Color + category header */}
+        <div className="flex items-center gap-3 mb-2">
+          <div
+            className="w-8 h-8 rounded"
+            style={{ background: c.brandColor, border: "1px solid var(--border)" }}
+          />
+          <div>
+            <Badge variant="muted">{c.category}</Badge>
+          </div>
+        </div>
+
+        <InfoRow label="What they do" value={c.whatTheyDo} />
+        <InfoRow label="Built for" value={c.builtFor} />
+        <InfoRow label="Brand feel" value={c.brandFeel} />
+        <InfoRow label="Fund details" value={c.fundDetails} />
+        <InfoRow label="Check size" value={c.checkSize} />
+        <InfoRow label="Portfolio" value={c.portfolio} />
+        <InfoRow label="Community" value={c.community} />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+          <HighlightBlock variant="forest" label="STRENGTH">
+            <p className="text-xs">{c.strength}</p>
+          </HighlightBlock>
+          <HighlightBlock variant="amber" label="WEAKNESS">
+            <p className="text-xs">{c.weakness}</p>
+          </HighlightBlock>
+          <HighlightBlock variant="gold" label="PHYCAP EDGE">
+            <p className="text-xs">{c.phycapEdge}</p>
+          </HighlightBlock>
+        </div>
+      </div>
+    </ExpandableCard>
+  );
+}
+
 /* ---- Sub-tab content sections ---- */
 
 function LandscapeContent() {
+  const [activeCategory, setActiveCategory] = useState("all");
+  const filtered = activeCategory === "all"
+    ? competitors
+    : competitors.filter((c) => c.categoryId === activeCategory);
+
   return (
     <>
       <KeyTakeaway label="KEY TAKEAWAY" text={competitiveKeyTakeaway} />
 
-      <SubTitle icon={<Swords size={16} />}>Competitive Density Map</SubTitle>
-      <div className="overflow-x-auto rounded-lg mb-8" style={{ border: "1px solid var(--border)" }}>
-        <table className="w-full text-sm">
-          <thead>
-            <tr style={{ background: "var(--muted)" }}>
-              {competitorDensity.headers.map((h, i) => (
-                <th key={i} className="px-4 py-2.5 text-left font-medium text-xs" style={{ color: "var(--muted-foreground)", borderBottom: "1px solid var(--border)" }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {competitorDensity.rows.map((row, ri) => (
-              <tr key={ri} style={{ borderBottom: ri < competitorDensity.rows.length - 1 ? "1px solid var(--border)" : "none" }}>
-                <td className="px-4 py-2.5 text-[13px]" style={{ color: "var(--foreground)" }}>{row[0]}</td>
-                <td className="px-4 py-2.5 text-[13px] font-medium" style={{ color: "var(--foreground)" }}>{row[1]}</td>
-                <td className="px-4 py-2.5 text-[13px]"><ThreatBadge level={row[2]} /></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Category filter pills */}
+      <div className="flex flex-wrap gap-1.5 mb-6">
+        {categories.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          const count = cat.id === "all" ? competitors.length : competitors.filter((c) => c.categoryId === cat.id).length;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className="px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5"
+              style={{
+                background: isActive ? forest : "var(--muted)",
+                color: isActive ? gold : "var(--muted-foreground)",
+                border: isActive ? `1px solid ${gold}` : "1px solid var(--border)",
+              }}
+            >
+              {cat.label}
+              <span
+                className="px-1.5 py-0.5 rounded-full text-[10px]"
+                style={{
+                  background: isActive ? "oklch(0.77 0.07 72 / 0.2)" : "oklch(0.50 0.02 200 / 0.1)",
+                  color: isActive ? gold : "var(--muted-foreground)",
+                }}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Competitor cards */}
+      <div className="space-y-3 mb-8">
+        {filtered.map((c) => (
+          <CompetitorCard key={c.name} c={c} />
+        ))}
       </div>
 
       <SubTitle icon={<Crosshair size={16} />}>Head-to-Head: PhyCap vs. Scrub Capital</SubTitle>
