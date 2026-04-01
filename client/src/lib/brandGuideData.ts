@@ -578,3 +578,126 @@ export const archetypeGuide = {
     { dimension: "Urgent vs. Patient", position: "Patient", note: "Present the case with the same thoroughness physicians use in clinical decision-making." },
   ],
 };
+
+/* ------------------------------------------------------------
+   COLOR GROUPINGS
+   ------------------------------------------------------------ */
+export const colorGroups = [
+  { label: "Primary", colors: ["Forest", "Gold"] },
+  { label: "Neutrals", colors: ["Blue Black", "Dark Slate", "Cream", "White"] },
+  { label: "Utility", colors: ["Black"] },
+];
+
+/* ------------------------------------------------------------
+   PRESS & MEDIA
+   ------------------------------------------------------------ */
+export interface NamingConvention {
+  label: string;
+  detail: string;
+}
+
+export interface PronunciationEntry {
+  term: string;
+  guide: string;
+}
+
+export interface BoilerplateEntry {
+  label: string;
+  wordCount: string;
+  text: string;
+}
+
+export const pressGuide = {
+  namingConventions: [
+    { label: "Operating name", detail: "PhyCap (preferred in most contexts)" },
+    { label: "Legal name", detail: "Physicians Capital Fund (for legal documents, SEC filings, formal press)" },
+    { label: "Fund reference", detail: "PhyCap Fund or PhyCap Fund I (when referring to the specific fund vehicle)" },
+    {
+      label: "Never use",
+      detail: '"Phy Cap" (two words), "PHYCAP" (all caps), "Phycap" (lowercase c), "PhyCap Ventures"',
+    },
+    {
+      label: "First mention rule",
+      detail: '"PhyCap (Physicians Capital Fund)" on first mention, then "PhyCap" thereafter',
+    },
+    {
+      label: "Service mark",
+      detail: '"Investing with Clinical Precision\u2120" always includes the \u2120 symbol',
+    },
+  ] as NamingConvention[],
+
+  pronunciation: [
+    { term: "PhyCap", guide: '"FY-cap" (rhymes with "sky cap"). The "Phy" comes from Physician.' },
+    { term: "MHCDS", guide: 'Spelled out "M-H-C-D-S" or say "Master of Health Care Delivery Science"' },
+    { term: "SaMD", guide: '"Sam-D" or spelled out "S-a-M-D" (Software as a Medical Device)' },
+    { term: "PhyCap Fund", guide: '"FY-cap Fund" (not "the PhyCap fund" with lowercase f)' },
+  ] as PronunciationEntry[],
+
+  boilerplates: [
+    {
+      label: "One-liner",
+      wordCount: "~15 words",
+      text: "PhyCap is a physician-led venture capital fund investing at the point of care delivery.",
+    },
+    {
+      label: "Two-sentence",
+      wordCount: "~35 words",
+      text: "PhyCap (Physicians Capital Fund) is a physician-led venture capital fund investing in Clinical Care Delivery Workflow Optimization, Software as a Medical Device, and Women's Health. The fund is led by 10 physician GPs spanning 13+ medical specialties.",
+    },
+    {
+      label: "Short paragraph",
+      wordCount: "~75 words",
+      text: "PhyCap (Physicians Capital Fund) is a physician-led early-stage venture capital fund writing $150K to $500K checks from Seed through Series A. Founded in 2024, PhyCap invests in three areas where clinical expertise creates an investment advantage: Clinical Care Delivery Workflow Optimization, Software as a Medical Device (FDA Class I/II), and Women's Health and Health Inequity. The fund's 10 General Partners bring 168+ years of combined clinical experience across 13+ medical specialties.",
+    },
+    {
+      label: "Medium paragraph",
+      wordCount: "~120 words",
+      text: "PhyCap (Physicians Capital Fund) is a physician-led early-stage venture capital fund that invests where clinical expertise creates a structural advantage. Writing $150K to $500K checks from Seed through Series A, PhyCap focuses on three investment pillars: Clinical Care Delivery Workflow Optimization, Software as a Medical Device (FDA Class I/II), and Women's Health and Health Inequity. What distinguishes PhyCap is the depth of its General Partner team: 10 physicians spanning orthopedic surgery, OB-GYN, emergency medicine, pediatric cardiothoracic surgery, radiology, and internal medicine. Two GPs hold Dartmouth's Master of Health Care Delivery Science, a credential held by fewer than 500 people worldwide. PhyCap is co-managed with FortySix Venture Capital from Tulsa, Oklahoma.",
+    },
+    {
+      label: "Full press boilerplate",
+      wordCount: "~175 words",
+      text: "PhyCap (Physicians Capital Fund) is a physician-led early-stage venture capital fund investing at the moment care is delivered. Writing $150K to $500K checks from Seed through Series A, PhyCap targets three areas where the gap between clinical reality and available technology creates an investment opportunity: Clinical Care Delivery Workflow Optimization, Software as a Medical Device (FDA Class I/II), and Women's Health and Health Inequity. The fund explicitly excludes life sciences and pharmaceuticals.\n\nPhyCap's diligence advantage comes from its General Partner team: 10 physicians covering the full arc of human medicine, from pediatric cardiothoracic surgery through reproductive health, acute care, musculoskeletal, and internal systems. Two GPs hold Dartmouth's Master of Health Care Delivery Science, the only graduate degree designed for physicians leading healthcare systems transformation. Lead GP Paul Slosar, MD, MHCDS practiced spine surgery for 28 years and served as CMO of Titan Spine prior to its acquisition by Medtronic.\n\nPhyCap is co-managed with FortySix Venture Capital and headquartered at 12 N Cheyenne Ave, Tulsa, OK 74103. Contact: info@46.capital.",
+    },
+  ] as BoilerplateEntry[],
+};
+
+/* ------------------------------------------------------------
+   PARTNERSHIPS
+   ------------------------------------------------------------ */
+export const partnershipsGuide = {
+  coBrandingRules: [
+    "When PhyCap appears alongside a partner, the PhyCap logo should be equal size or larger (never smaller than the partner).",
+    "Minimum clear space around the PhyCap logo: 1x the cap height of the \"P\" in PhyCap.",
+    "PhyCap colors (Forest, Gold) should not be altered in co-branded materials.",
+    "Partner logos should not be placed on PhyCap's Forest green background unless pre-approved.",
+    "For event co-branding (like Women's Health Nexus): PhyCap as presenting partner gets primary logo placement, upper left or centered.",
+  ],
+  partnerKit: [
+    { item: "Logo files", note: "SVG versions pending; PNG available via CDN", ready: false },
+    { item: "Brand colors (hex values)", note: "Available in this guide", ready: true },
+    { item: "Boilerplate text", note: "See Press & Media section above", ready: true },
+    { item: "GP headshots", note: "Pending", ready: false },
+    { item: "Social media links", note: "LinkedIn confirmed; X/Twitter and YouTube unverified", ready: false },
+    { item: "Contact information", note: "info@46.capital", ready: true },
+  ],
+};
+
+/* ------------------------------------------------------------
+   CONNECT / SOCIAL
+   ------------------------------------------------------------ */
+export interface ConnectLink {
+  label: string;
+  url: string;
+  type: "link" | "email" | "address";
+  note?: string;
+}
+
+export const connectLinks: ConnectLink[] = [
+  { label: "LinkedIn Company Page", url: "https://www.linkedin.com/company/phycap/", type: "link" },
+  { label: "Contact Email", url: "info@46.capital", type: "email" },
+  { label: "Website", url: "https://phycapfund.com", type: "link" },
+  { label: "HQ Address", url: "12 N Cheyenne Ave, Tulsa, OK 74103", type: "address" },
+  { label: "X / Twitter", url: "", type: "link", note: "Presence not yet verified as active" },
+  { label: "YouTube", url: "", type: "link", note: "Presence not yet verified as active" },
+];

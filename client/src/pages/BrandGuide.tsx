@@ -8,6 +8,10 @@ import {
   photographyGuide,
   voiceGuide,
   archetypeGuide,
+  colorGroups,
+  pressGuide,
+  partnershipsGuide,
+  connectLinks,
 } from "../lib/brandGuideData";
 
 /* ============================================================
@@ -20,6 +24,9 @@ const SECTIONS = [
   { id: "photography", number: "04", title: "Photography" },
   { id: "voice", number: "05", title: "Voice & Tone" },
   { id: "archetype", number: "06", title: "Brand Archetype" },
+  { id: "press", number: "07", title: "Press & Media" },
+  { id: "partnerships", number: "08", title: "Partnerships" },
+  { id: "connect", number: "09", title: "Connect" },
 ] as const;
 
 const forest = "var(--phycap-forest)";
@@ -29,29 +36,29 @@ const blueBlack = "var(--phycap-blue-black)";
 const border = "var(--border)";
 
 /* ============================================================
-   COPY HEX COMPONENT
+   COPY BUTTON (generic text copy)
    ============================================================ */
-function CopyHex({ hex, light = false }: { hex: string; light?: boolean }) {
+function CopyButton({ text, label, light = false }: { text: string; label?: string; light?: boolean }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(hex).then(() => {
+    navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     });
-  }, [hex]);
+  }, [text]);
 
   return (
     <button
       onClick={handleCopy}
-      className="mono-font inline-flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-200 cursor-pointer"
+      className="inline-flex items-center gap-1.5 px-2 py-1 rounded transition-all duration-200 cursor-pointer"
       style={{
         fontSize: "12px",
         background: light ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.06)",
         color: light ? "rgba(255,255,255,0.9)" : "var(--foreground)",
         border: "1px solid transparent",
       }}
-      title={`Copy ${hex}`}
+      title={`Copy ${label || text}`}
     >
       {copied ? (
         <>
@@ -66,10 +73,75 @@ function CopyHex({ hex, light = false }: { hex: string; light?: boolean }) {
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
           </svg>
-          <span>{hex}</span>
+          <span className="mono-font">{label || text}</span>
         </>
       )}
     </button>
+  );
+}
+
+/* ============================================================
+   COPY HEX (small variant for swatches)
+   ============================================================ */
+function CopyHex({ hex, light = false }: { hex: string; light?: boolean }) {
+  return <CopyButton text={hex} label={hex} light={light} />;
+}
+
+/* ============================================================
+   ACCESSIBILITY ICON (collapsible)
+   ============================================================ */
+function AccessibilityToggle({ note }: { note: string }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="mt-2">
+      <button
+        onClick={() => setOpen(!open)}
+        className="inline-flex items-center gap-1 cursor-pointer transition-opacity hover:opacity-80"
+        title="View accessibility details"
+      >
+        {/* Blue circle with accessibility person icon */}
+        <span
+          className="relative inline-flex items-center justify-center rounded-full"
+          style={{ width: 22, height: 22, background: "oklch(0.55 0.15 250)" }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="4.5" r="2.5" />
+            <path d="M12 7.5v5m0 0l-3 5m3-5l3 5M7 11h10" />
+          </svg>
+          {/* Green checkmark badge */}
+          <span
+            className="absolute flex items-center justify-center rounded-full"
+            style={{
+              width: 10,
+              height: 10,
+              background: "oklch(0.60 0.18 145)",
+              bottom: -2,
+              right: -2,
+              border: "1.5px solid var(--card)",
+            }}
+          >
+            <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </span>
+        </span>
+        <span className="text-[10px] font-medium" style={{ color: "oklch(0.50 0.12 250)" }}>
+          {open ? "Hide" : "A11y"}
+        </span>
+      </button>
+      {open && (
+        <div
+          className="mt-1.5 px-2.5 py-2 rounded text-[11px] leading-snug"
+          style={{
+            background: "oklch(0.60 0.12 250 / 0.08)",
+            color: "oklch(0.45 0.12 250)",
+          }}
+        >
+          {note}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -443,7 +515,7 @@ export default function BrandGuide() {
           <div className="h-px" style={{ background: border }} />
 
           {/* ============================================================
-             01 — COLOR SYSTEM
+             01 — COLOR SYSTEM (redesigned)
              ============================================================ */}
           <Section id="color" number="01" title="Color System" sectionRef={setSectionRef("color")}>
             <p className="text-sm leading-relaxed mb-8" style={{ color: "var(--muted-foreground)", maxWidth: "560px" }}>
@@ -452,61 +524,66 @@ export default function BrandGuide() {
               clinical authority, and institutional trust.
             </p>
 
-            {/* Color Swatches */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-              {colorGuide.map((color) => {
-                const isLight = ["Cream", "White"].includes(color.name);
-                const swatchBg = color.hex;
-                const textOnSwatch = isLight ? "#070808" : "#FFFFFF";
-                return (
+            {/* Grouped Color Swatches */}
+            {colorGroups.map((group) => {
+              const groupColors = colorGuide.filter((c) => group.colors.includes(c.name));
+              return (
+                <div key={group.label} className="mb-10">
                   <div
-                    key={color.name}
-                    className="rounded-lg overflow-hidden"
-                    style={{ border: `1px solid ${border}` }}
+                    className="eyebrow mb-4"
+                    style={{ color: gold, fontSize: "10px", letterSpacing: "0.12em" }}
                   >
-                    {/* Color block */}
-                    <div
-                      className="p-5 flex flex-col justify-between"
-                      style={{
-                        background: swatchBg,
-                        minHeight: "140px",
-                        color: textOnSwatch,
-                      }}
-                    >
-                      <div>
-                        <div className="font-semibold text-sm">{color.name}</div>
-                        <div className="text-xs mt-0.5 opacity-80">{color.role}</div>
-                      </div>
-                      <div className="mt-4">
-                        <CopyHex hex={color.hex} light={!isLight} />
-                      </div>
-                    </div>
-                    {/* Details */}
-                    <div className="p-4" style={{ background: "var(--card)" }}>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="mono-font text-[11px]" style={{ color: "var(--muted-foreground)" }}>
-                          {color.oklch}
-                        </span>
-                      </div>
-                      <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-                        {color.usage}
-                      </p>
-                      {color.accessibilityNote && (
-                        <div
-                          className="mt-2 px-2 py-1.5 rounded text-[11px] leading-snug"
-                          style={{
-                            background: "oklch(0.60 0.12 250 / 0.08)",
-                            color: "oklch(0.45 0.12 250)",
-                          }}
-                        >
-                          {color.accessibilityNote}
-                        </div>
-                      )}
-                    </div>
+                    {group.label.toUpperCase()}
                   </div>
-                );
-              })}
-            </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {groupColors.map((color) => {
+                      const isLight = ["Cream", "White"].includes(color.name);
+                      const textOnSwatch = isLight ? "#070808" : "#FFFFFF";
+                      return (
+                        <div
+                          key={color.name}
+                          className="rounded-lg overflow-hidden"
+                          style={{ border: `1px solid ${border}` }}
+                        >
+                          {/* Large color swatch */}
+                          <div
+                            className="p-5 flex flex-col justify-between"
+                            style={{
+                              background: color.hex,
+                              minHeight: "120px",
+                              color: textOnSwatch,
+                            }}
+                          >
+                            <div className="font-semibold text-base">{color.name}</div>
+                            <CopyHex hex={color.hex} light={!isLight} />
+                          </div>
+                          {/* Consolidated info block */}
+                          <div className="p-4 space-y-1.5" style={{ background: "var(--card)" }}>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1">
+                              <span className="mono-font text-[11px]" style={{ color: "var(--muted-foreground)" }}>
+                                RGB: {color.rgb}
+                              </span>
+                              <span className="mono-font text-[11px]" style={{ color: "var(--muted-foreground)" }}>
+                                {color.oklch}
+                              </span>
+                            </div>
+                            <p className="text-xs font-medium" style={{ color: "var(--foreground)" }}>
+                              {color.role}
+                            </p>
+                            <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                              {color.usage}
+                            </p>
+                            {color.accessibilityNote && (
+                              <AccessibilityToggle note={color.accessibilityNote} />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
 
             {/* Palette Ratios */}
             <SubHeading>Palette Ratios</SubHeading>
@@ -541,7 +618,7 @@ export default function BrandGuide() {
             <div className="space-y-4">
               {colorGuide
                 .filter((c) => c.doRules.length > 0 || c.dontRules.length > 0)
-                .slice(0, 5) // Show the most important 5
+                .slice(0, 5)
                 .map((color) => (
                   <div key={color.name}>
                     <div className="flex items-center gap-3 mb-3">
@@ -753,7 +830,7 @@ export default function BrandGuide() {
           <div className="h-px" style={{ background: border }} />
 
           {/* ============================================================
-             03 — LOGO
+             03 — LOGO (with visible images)
              ============================================================ */}
           <Section id="logo" number="03" title="Logo" sectionRef={setSectionRef("logo")}>
             <p className="text-sm leading-relaxed mb-8" style={{ color: "var(--muted-foreground)", maxWidth: "560px" }}>
@@ -785,41 +862,70 @@ export default function BrandGuide() {
               ))}
             </div>
 
-            {/* Confirmed Files */}
-            <SubHeading>Confirmed Logo Files</SubHeading>
+            {/* Logo Files with Inline Images */}
+            <SubHeading>Logo Files</SubHeading>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              {logoGuide.confirmedFiles.map((file) => (
+              {/* Light logo on dark background */}
+              <div
+                className="rounded-lg overflow-hidden"
+                style={{ border: `1px solid ${border}` }}
+              >
                 <div
-                  key={file.filename}
-                  className="rounded-lg overflow-hidden"
-                  style={{ border: `1px solid ${border}` }}
+                  className="p-8 flex items-center justify-center"
+                  style={{ background: "#122620", minHeight: "140px" }}
                 >
-                  <div
-                    className="p-8 flex items-center justify-center"
-                    style={{
-                      background: file.filename.includes("dark") ? cream : forest,
-                      minHeight: "100px",
-                    }}
-                  >
-                    <span
-                      className="mono-font text-xs"
-                      style={{
-                        color: file.filename.includes("dark") ? blueBlack : "oklch(0.65 0.01 60)",
-                      }}
-                    >
-                      {file.filename}
-                    </span>
-                  </div>
-                  <div className="p-4" style={{ background: "var(--card)" }}>
-                    <div className="text-xs font-medium mb-1" style={{ color: "var(--foreground)" }}>
-                      {file.useOn}
-                    </div>
-                    <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
-                      {file.description}
-                    </p>
-                  </div>
+                  <img
+                    src="https://cdn.prod.website-files.com/66da76af0489fb1ad7bfbfa0/66da78e9a97fa62f6b7601dd_logo-120.png"
+                    alt="PhyCap logo for dark backgrounds"
+                    style={{ maxHeight: "80px", width: "auto" }}
+                  />
                 </div>
-              ))}
+                <div className="p-4" style={{ background: "var(--card)" }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="mono-font text-xs" style={{ color: "var(--foreground)" }}>logo-120.png</span>
+                  </div>
+                  <div className="text-xs font-medium mb-1" style={{ color: "var(--foreground)" }}>
+                    Use on: Dark backgrounds (Forest, Blue Black, Dark Slate)
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                    Light-colored (reversed) logo mark and wordmark for placement on dark surfaces. Monogram and wordmark render in white or cream.
+                  </p>
+                  <p className="text-[10px] mt-2" style={{ color: "var(--muted-foreground)" }}>
+                    Note: SVG versions pending. Contact info@46.capital for high-resolution files.
+                  </p>
+                </div>
+              </div>
+
+              {/* Dark logo on light background */}
+              <div
+                className="rounded-lg overflow-hidden"
+                style={{ border: `1px solid ${border}` }}
+              >
+                <div
+                  className="p-8 flex items-center justify-center"
+                  style={{ background: "#F5F2F0", minHeight: "140px" }}
+                >
+                  <img
+                    src="https://cdn.prod.website-files.com/66da76af0489fb1ad7bfbfa0/66da78e9e92e4eb10df570cb_logo-dark-120.png"
+                    alt="PhyCap logo for light backgrounds"
+                    style={{ maxHeight: "80px", width: "auto" }}
+                  />
+                </div>
+                <div className="p-4" style={{ background: "var(--card)" }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="mono-font text-xs" style={{ color: "var(--foreground)" }}>logo-dark-120.png</span>
+                  </div>
+                  <div className="text-xs font-medium mb-1" style={{ color: "var(--foreground)" }}>
+                    Use on: Light backgrounds (White, Cream)
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                    Dark-colored logo mark and wordmark for placement on light surfaces. The P/C monogram with integrated medical cross reads clearly against White and Cream.
+                  </p>
+                  <p className="text-[10px] mt-2" style={{ color: "var(--muted-foreground)" }}>
+                    Note: SVG versions pending. Contact info@46.capital for high-resolution files.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Safe Zone */}
@@ -970,7 +1076,7 @@ export default function BrandGuide() {
                 className="px-5 py-3.5 flex items-center gap-3"
                 style={{ background: forest }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={gold.replace("var(--phycap-gold)", "#D3B184")} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#D3B184" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D3B184" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <line x1="14.31" y1="8" x2="20.05" y2="17.94" />
                   <line x1="9.69" y1="8" x2="21.17" y2="8" />
@@ -1447,6 +1553,300 @@ export default function BrandGuide() {
                       {s.note}
                     </p>
                   </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <div className="h-px" style={{ background: border }} />
+
+          {/* ============================================================
+             07 — PRESS & MEDIA
+             ============================================================ */}
+          <Section id="press" number="07" title="Press & Media" sectionRef={setSectionRef("press")}>
+            <p className="text-sm leading-relaxed mb-8" style={{ color: "var(--muted-foreground)", maxWidth: "560px" }}>
+              Naming conventions, pronunciation, and ready-to-use boilerplate text for press releases,
+              conference programs, partnership materials, and any external communications.
+            </p>
+
+            {/* Naming Conventions */}
+            <SubHeading>Naming Conventions</SubHeading>
+            <div
+              className="rounded-lg overflow-hidden mb-10"
+              style={{ border: `1px solid ${border}` }}
+            >
+              {pressGuide.namingConventions.map((entry, i) => (
+                <div
+                  key={entry.label}
+                  className="flex flex-col sm:flex-row"
+                  style={{
+                    borderBottom:
+                      i < pressGuide.namingConventions.length - 1
+                        ? `1px solid ${border}`
+                        : "none",
+                  }}
+                >
+                  <div
+                    className="px-5 py-3.5 sm:w-44 flex-shrink-0"
+                    style={{ background: "var(--muted)" }}
+                  >
+                    <span className="text-xs font-semibold" style={{ color: "var(--foreground)" }}>
+                      {entry.label}
+                    </span>
+                  </div>
+                  <div className="px-5 py-3.5 flex-1" style={{ background: "var(--card)" }}>
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
+                      {entry.detail}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pronunciation Guide */}
+            <SubHeading>Pronunciation Guide</SubHeading>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+              {pressGuide.pronunciation.map((entry) => (
+                <div
+                  key={entry.term}
+                  className="rounded-lg p-4"
+                  style={{ background: "var(--card)", border: `1px solid ${border}` }}
+                >
+                  <div className="text-sm font-semibold mb-1" style={{ color: "var(--foreground)" }}>
+                    {entry.term}
+                  </div>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                    {entry.guide}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Boilerplates */}
+            <SubHeading>Boilerplate Text</SubHeading>
+            <p className="text-sm mb-4" style={{ color: "var(--muted-foreground)" }}>
+              Five lengths for different contexts. Each includes a copy button.
+            </p>
+            <div className="space-y-4">
+              {pressGuide.boilerplates.map((bp) => (
+                <div
+                  key={bp.label}
+                  className="rounded-lg overflow-hidden"
+                  style={{ border: `1px solid ${border}` }}
+                >
+                  <div
+                    className="px-4 py-2 flex items-center justify-between"
+                    style={{
+                      background: "var(--muted)",
+                      borderBottom: `1px solid ${border}`,
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="text-[10px] font-semibold uppercase"
+                        style={{ letterSpacing: "0.1em", color: gold }}
+                      >
+                        {bp.label}
+                      </span>
+                      <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
+                        {bp.wordCount}
+                      </span>
+                    </div>
+                    <CopyButton text={bp.text} label="Copy" />
+                  </div>
+                  <div className="p-4" style={{ background: "var(--card)" }}>
+                    <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "var(--foreground)" }}>
+                      {bp.text}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <div className="h-px" style={{ background: border }} />
+
+          {/* ============================================================
+             08 — PARTNERSHIPS
+             ============================================================ */}
+          <Section id="partnerships" number="08" title="Partnerships" sectionRef={setSectionRef("partnerships")}>
+            <p className="text-sm leading-relaxed mb-8" style={{ color: "var(--muted-foreground)", maxWidth: "560px" }}>
+              Guidelines for co-branded materials, event partnerships, and sponsor collateral.
+              Includes a partner kit checklist with everything an external contact needs.
+            </p>
+
+            {/* Co-branding Guidelines */}
+            <SubHeading>Co-Branding Guidelines</SubHeading>
+            <div
+              className="rounded-lg overflow-hidden mb-10"
+              style={{ border: `1px solid ${border}` }}
+            >
+              {partnershipsGuide.coBrandingRules.map((rule, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 px-5 py-3.5"
+                  style={{
+                    background: "var(--card)",
+                    borderBottom:
+                      i < partnershipsGuide.coBrandingRules.length - 1
+                        ? `1px solid ${border}`
+                        : "none",
+                  }}
+                >
+                  <span
+                    className="mono-font text-[10px] font-bold flex-shrink-0 mt-1"
+                    style={{ color: gold }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
+                    {rule}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Partner Kit */}
+            <SubHeading>Partner Kit Checklist</SubHeading>
+            <p className="text-sm mb-4" style={{ color: "var(--muted-foreground)" }}>
+              What to send a partner, sponsor, or press contact:
+            </p>
+            <div
+              className="rounded-lg overflow-hidden"
+              style={{ border: `1px solid ${border}` }}
+            >
+              {partnershipsGuide.partnerKit.map((entry, i) => (
+                <div
+                  key={entry.item}
+                  className="flex items-center gap-3 px-5 py-3.5"
+                  style={{
+                    background: "var(--card)",
+                    borderBottom:
+                      i < partnershipsGuide.partnerKit.length - 1
+                        ? `1px solid ${border}`
+                        : "none",
+                  }}
+                >
+                  {/* Checkbox icon */}
+                  <div
+                    className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: entry.ready
+                        ? "oklch(0.55 0.18 145 / 0.12)"
+                        : "oklch(0.75 0.07 72 / 0.12)",
+                      border: `1px solid ${entry.ready ? "oklch(0.55 0.18 145 / 0.25)" : "oklch(0.75 0.07 72 / 0.25)"}`,
+                    }}
+                  >
+                    {entry.ready ? (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="oklch(0.45 0.15 145)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : (
+                      <span className="text-[8px] font-bold" style={{ color: "oklch(0.50 0.10 72)" }}>...</span>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                      {entry.item}
+                    </span>
+                    <span className="text-xs ml-2" style={{ color: "var(--muted-foreground)" }}>
+                      {entry.note}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <div className="h-px" style={{ background: border }} />
+
+          {/* ============================================================
+             09 — CONNECT
+             ============================================================ */}
+          <Section id="connect" number="09" title="Connect" sectionRef={setSectionRef("connect")}>
+            <p className="text-sm leading-relaxed mb-8" style={{ color: "var(--muted-foreground)", maxWidth: "560px" }}>
+              Official channels and contact information for PhyCap.
+            </p>
+
+            <div
+              className="rounded-lg overflow-hidden"
+              style={{ border: `1px solid ${border}` }}
+            >
+              {connectLinks.map((link, i) => (
+                <div
+                  key={link.label}
+                  className="flex items-center gap-4 px-5 py-4"
+                  style={{
+                    background: "var(--card)",
+                    borderBottom:
+                      i < connectLinks.length - 1
+                        ? `1px solid ${border}`
+                        : "none",
+                  }}
+                >
+                  {/* Icon */}
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: "oklch(0.20 0.03 163 / 0.08)" }}
+                  >
+                    {link.type === "email" ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--foreground)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <path d="M22 7l-10 7L2 7" />
+                      </svg>
+                    ) : link.type === "address" ? (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--foreground)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                    ) : (
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--foreground)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+                        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+                      </svg>
+                    )}
+                  </div>
+
+                  {/* Label and URL */}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                      {link.label}
+                    </div>
+                    {link.url ? (
+                      link.type === "link" ? (
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs hover:underline"
+                          style={{ color: "var(--muted-foreground)" }}
+                        >
+                          {link.url}
+                        </a>
+                      ) : link.type === "email" ? (
+                        <a
+                          href={`mailto:${link.url}`}
+                          className="text-xs hover:underline"
+                          style={{ color: "var(--muted-foreground)" }}
+                        >
+                          {link.url}
+                        </a>
+                      ) : (
+                        <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+                          {link.url}
+                        </span>
+                      )
+                    ) : link.note ? (
+                      <span className="text-xs italic" style={{ color: "var(--muted-foreground)" }}>
+                        {link.note}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {/* Copy button */}
+                  {link.url && (
+                    <CopyButton text={link.url} label="Copy" />
+                  )}
                 </div>
               ))}
             </div>
