@@ -33,7 +33,7 @@ export function KeyTakeaway({ text, label }: { text: string; label?: string }) {
   return (
     <div
       className="rounded-lg p-5 mb-6"
-      style={{ background: "var(--card)", border: `1px solid ${border}`, borderLeft: `3px solid ${gold}` }}
+      style={{ background: "var(--card)", borderLeft: `3px solid ${gold}` }}
     >
       {label && <div className="eyebrow mb-2" style={{ color: gold }}>{label}</div>}
       <p style={{ color: "var(--foreground)", fontSize: "15px", lineHeight: 1.7 }}>{text}</p>
@@ -70,8 +70,8 @@ export function Card({
       className="rounded-lg p-5"
       style={{
         background: "var(--card)",
-        border: `1px solid ${border}`,
         borderTop: `2px solid ${accentColors[variant]}`,
+        boxShadow: "0 1px 3px oklch(0 0 0 / 0.04)",
       }}
     >
       {title && (
@@ -104,7 +104,6 @@ export function StatCard({
       className="rounded-lg p-4"
       style={{
         background: accent ? forest : "var(--card)",
-        border: accent ? "none" : `1px solid ${border}`,
       }}
     >
       <div
@@ -186,7 +185,7 @@ export function Badge({ children, variant = "muted" }: { children: ReactNode; va
    ============================================================ */
 export function DataTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
   return (
-    <div className="overflow-x-auto rounded-lg" style={{ border: `1px solid ${border}` }}>
+    <div className="overflow-x-auto rounded-lg">
       <table className="w-full text-sm">
         <thead>
           <tr style={{ background: "var(--muted)" }}>
@@ -237,9 +236,8 @@ export function HighlightBlock({
   };
   return (
     <div
-      className="rounded-lg p-4 mb-4"
+      className="pl-4 mb-4"
       style={{
-        background: "var(--muted)",
         borderLeft: `3px solid ${accentMap[variant]}`,
       }}
     >
@@ -254,7 +252,7 @@ export function HighlightBlock({
    ============================================================ */
 export function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start gap-3 py-2" style={{ borderBottom: `1px solid oklch(0.50 0.01 200 / 0.1)` }}>
+    <div className="flex items-start gap-3 py-2.5" style={{ borderBottom: `1px solid oklch(0.50 0.01 200 / 0.05)` }}>
       <span className="text-xs font-medium flex-shrink-0 w-32" style={{ color: mutedText }}>{label}</span>
       <span className="text-sm" style={{ color: "var(--foreground)" }}>{value}</span>
     </div>
@@ -290,7 +288,7 @@ export function ScoreBar({ label, score, max = 10 }: { label: string; score: num
    ============================================================ */
 export function QuoteBlock({ quote, attribution, credential }: { quote: string; attribution: string; credential?: string }) {
   return (
-    <div className="rounded-lg p-5 mb-4" style={{ background: "var(--phycap-cream)", border: `1px solid ${border}` }}>
+    <div className="rounded-lg p-5 mb-4" style={{ background: "var(--phycap-cream)" }}>
       <div className="display-font text-3xl mb-2" style={{ color: gold, lineHeight: 0.5 }}>"</div>
       <p className="italic text-sm mb-3" style={{ color: "var(--foreground)", lineHeight: 1.7 }}>{quote}</p>
       <div className="flex items-center gap-2">

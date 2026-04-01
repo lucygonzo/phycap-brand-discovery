@@ -73,7 +73,7 @@ export function ExpandableCard({
   return (
     <div
       className="rounded-lg overflow-hidden transition-all"
-      style={{ background: "var(--card)", border: "1px solid var(--border)" }}
+      style={{ background: "var(--card)", boxShadow: "0 1px 3px oklch(0 0 0 / 0.04)" }}
     >
       <button
         onClick={() => setOpen(!open)}
