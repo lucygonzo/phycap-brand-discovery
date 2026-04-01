@@ -2,6 +2,7 @@ import { Router, Route, Switch } from "wouter";
 import { NavigationProvider } from "./contexts/NavigationContext";
 import { Toaster } from "sonner";
 import Home from "./pages/Home";
+import BrandGuide from "./pages/BrandGuide";
 import NotFound from "./pages/NotFound";
 
 // Support GitHub Pages subdirectory deployment
@@ -13,6 +14,7 @@ export default function App() {
       <NavigationProvider>
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/brand-guide" component={BrandGuide} />
           <Route component={NotFound} />
         </Switch>
         <Toaster position="bottom-right" />

@@ -3,7 +3,9 @@ import {
   BarChart3, Building2, AlertCircle, Fingerprint, Palette, MessageSquare,
   Target, Users, Swords, Route, Globe, Rocket, TrendingUp, DollarSign,
   Briefcase, CheckSquare, BookOpen, ClipboardCheck, Mic2, Menu, X, Moon, Sun,
+  FileText,
 } from "lucide-react";
+import { Link } from "wouter";
 import type { TabId } from "../contexts/NavigationContext";
 import type { ReactNode } from "react";
 
@@ -148,6 +150,22 @@ export default function Layout({ activeTab, onTabChange, children }: LayoutProps
               })}
             </div>
           ))}
+          {/* Brand Guide link */}
+          <div className="mb-4 mt-2 px-1">
+            <div className="h-px mb-3" style={{ background: "var(--sidebar-border)" }} />
+            <Link
+              href="/brand-guide"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition-colors"
+              style={{
+                color: gold,
+                background: "oklch(0.77 0.07 72 / 0.08)",
+                border: "1px solid oklch(0.77 0.07 72 / 0.20)",
+              }}
+            >
+              <FileText size={16} />
+              Brand Guide
+            </Link>
+          </div>
         </nav>
 
         {/* Footer */}
