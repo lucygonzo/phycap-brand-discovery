@@ -54,7 +54,7 @@ export const segments = [
     revenueImpact: "Low-Medium",
     brandBuilding: "High",
     description:
-      "Organizations that co-invest, co-host events, provide deal flow, or amplify PhyCap's platform. Includes FortySix Venture Capital and health systems.",
+      "Organizations that co-invest, co-host events, provide deal flow, or amplify PhyCap's platform. Includes FortySix Capital and health systems.",
   },
 ];
 

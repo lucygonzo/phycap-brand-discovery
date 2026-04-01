@@ -8,7 +8,7 @@ export const companyMeta = {
   stage: "Seed through Series A",
   exclusions: "Life sciences, pharmaceuticals",
   portfolio: "BioReact (publicly confirmed)",
-  coManager: "FortySix Venture Capital",
+  coManager: "FortySix Capital",
 };
 
 export const companyStats = [
@@ -19,10 +19,25 @@ export const companyStats = [
 ];
 
 export const namingRules = [
-  { context: "Primary (external, social, content)", name: "PhyCap" },
-  { context: "Legal, regulatory, fund documents", name: "Physicians Capital Fund" },
-  { context: "Secondary reference", name: "PhyCap Fund" },
+  { context: "Conversation / pitch (always)", name: "PhyCap" },
+  { context: "First written mention", name: "PhyCap (Physicians Capital Fund), then PhyCap thereafter" },
+  { context: "Legal / SEC documents", name: "Physicians Capital Fund" },
+  { context: "Fund vehicle reference", name: "PhyCap Fund I" },
   { context: "Rule", name: "Do not alternate between all three within a single piece." },
+];
+
+export const namingPronunciation = {
+  phonetic: "FY-cap",
+  origin: "The \"Phy\" comes from Physician. The Ph is pronounced like \"Physician,\" not like \"physical.\"",
+  verbalRule: "We are PhyCap, not FICAP.",
+};
+
+export const namingNeverList = [
+  { wrong: "Phy Cap", reason: "Two words. Always one word." },
+  { wrong: "PHYCAP", reason: "All caps. Never." },
+  { wrong: "Phycap", reason: "Lowercase c. The C is always capitalized." },
+  { wrong: "PhyCap Ventures", reason: "Ventures is not part of the name." },
+  { wrong: "FICAP", reason: "Mispronunciation. The Ph is from Physician." },
 ];
 
 export const investmentAreas = [
@@ -139,11 +154,28 @@ export const foundingWhyNow = [
 ];
 
 export const fortySixRelationship = {
-  summary: "PhyCap Fund I is co-managed with FortySix Venture Capital, a Tulsa-based venture firm. FortySix provides fund administration and operational infrastructure, allowing PhyCap's physician GPs to focus on deal sourcing, clinical diligence, and portfolio support.",
-  visibleIn: [
-    "PitchBook lists the fund as co-managed by FortySix Venture Capital and PhyCap Fund.",
-    "Contact email is info@46.capital (not @phycapfund.com).",
-    "Both firms share the same Tulsa address.",
+  whatFortySixDoes: [
+    "Fund administration",
+    "Legal infrastructure",
+    "Operational support",
   ],
-  recommendation: "Adopt a clear co-management disclosure that positions the relationship as a strength. Establish info@phycapfund.com as primary contact.",
+  whatPhyCapDoes: [
+    "Investment thesis",
+    "Deal sourcing",
+    "Clinical diligence",
+    "Portfolio support",
+    "LP relationships",
+  ],
+  whenToMention: [
+    "Formal fund documents",
+    "PitchBook listings",
+    "Operational disclosures",
+  ],
+  whenNotToMention: [
+    "Marketing content",
+    "LP recruitment materials",
+    "Founder-facing materials",
+    "Social media",
+  ],
+  emailIssue: "info@46.capital routes through FortySix Capital. Recommendation: establish hello@phycapfund.com or invest@phycapfund.com for brand-facing communications.",
 };

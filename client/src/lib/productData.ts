@@ -1,7 +1,7 @@
 // Product (Investment Strategy) data extracted from investment-strategy.md, differentiators.md
 
 export const fundOverview = [
-  { value: "$10M", label: "Fund I Target", note: "Co-managed with FortySix Venture Capital." },
+  { value: "$10M", label: "Fund I Target", note: "Co-managed with FortySix Capital." },
   { value: "$150K-$500K", label: "Check Size Range", note: "Seed to Series A. Upper end can lead a seed round." },
   { value: "15-25", label: "Target Portfolio Companies", note: "Allows diversification while maintaining meaningful ownership." },
   { value: "30-40%", label: "Follow-on Reserve", note: "Reserves protect ownership in winning portfolio companies." },
