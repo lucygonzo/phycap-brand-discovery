@@ -34,8 +34,8 @@ export default function GapTab() {
   return (
     <div className="p-6 max-w-5xl">
       <SectionHeader
-        number="14"
-        title="Gap Analysis"
+        number="05"
+        title="Gaps"
         subtitle="Perception scores, funnel audits, and a prioritized inventory of brand gaps."
       />
 

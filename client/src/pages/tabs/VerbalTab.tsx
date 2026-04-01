@@ -34,7 +34,7 @@ export default function VerbalTab() {
     <div className="p-6 max-w-5xl">
       <SectionHeader
         number="04"
-        title="Verbal Identity"
+        title="Voice"
         subtitle="Voice guidelines, messaging matrix, copy blocks, taglines, and the language retirement list."
       />
 

@@ -1,45 +1,33 @@
 import { useNavigation, type TabId } from "../contexts/NavigationContext";
 import Layout from "../components/Layout";
-import OverviewTab from "./tabs/OverviewTab";
-import CompanyTab from "./tabs/CompanyTab";
+import DashboardTab from "./tabs/DashboardTab";
 import IdentityTab from "./tabs/IdentityTab";
-import GapTab from "./tabs/GapTab";
-import VisualTab from "./tabs/VisualTab";
+import DesignSystemTab from "./tabs/DesignSystemTab";
 import VerbalTab from "./tabs/VerbalTab";
-import ThesisTab from "./tabs/ThesisTab";
-import AudienceTab from "./tabs/AudienceTab";
+import GapTab from "./tabs/GapTab";
+import AudienceJourneyTab from "./tabs/AudienceJourneyTab";
 import CompetitiveTab from "./tabs/CompetitiveTab";
-import JourneyTab from "./tabs/JourneyTab";
-import DigitalTab from "./tabs/DigitalTab";
-import GTMTab from "./tabs/GTMTab";
-import ProductTab from "./tabs/ProductTab";
-import RevenueTab from "./tabs/RevenueTab";
-import PortfolioTab from "./tabs/PortfolioTab";
-import ActionsTab from "./tabs/ActionsTab";
-import DecisionLogTab from "./tabs/DecisionLogTab";
-import ReportCardTab from "./tabs/ReportCardTab";
+import ThesisPortfolioTab from "./tabs/ThesisPortfolioTab";
+import GTMDigitalTab from "./tabs/GTMDigitalTab";
 import GPContentTab from "./tabs/GPContentTab";
+import RevenueTab from "./tabs/RevenueTab";
+import ActionsDecisionsTab from "./tabs/ActionsDecisionsTab";
+import ReportCardTab from "./tabs/ReportCardTab";
 
 const tabComponents: Record<TabId, React.ComponentType> = {
-  overview: OverviewTab,
-  company: CompanyTab,
-  gap: GapTab,
+  dashboard: DashboardTab,
   identity: IdentityTab,
-  visual: VisualTab,
-  verbal: VerbalTab,
-  thesis: ThesisTab,
-  audience: AudienceTab,
+  designsystem: DesignSystemTab,
+  voice: VerbalTab,
+  gaps: GapTab,
+  audiencejourney: AudienceJourneyTab,
   competitive: CompetitiveTab,
-  journey: JourneyTab,
-  digital: DigitalTab,
-  gtm: GTMTab,
-  product: ProductTab,
-  revenue: RevenueTab,
-  portfolio: PortfolioTab,
-  actions: ActionsTab,
-  decisions: DecisionLogTab,
-  reportcard: ReportCardTab,
+  thesisportfolio: ThesisPortfolioTab,
+  gtmdigital: GTMDigitalTab,
   gpcontent: GPContentTab,
+  revenue: RevenueTab,
+  actionsdecisions: ActionsDecisionsTab,
+  reportcard: ReportCardTab,
 };
 
 export default function Home() {

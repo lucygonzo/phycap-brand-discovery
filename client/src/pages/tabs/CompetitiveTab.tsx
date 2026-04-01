@@ -255,7 +255,7 @@ export default function CompetitiveTab() {
   return (
     <div className="p-6 max-w-5xl">
       <SectionHeader
-        number="08"
+        number="07"
         title="Competitive Landscape"
         subtitle="Direct competitors, positioning matrix, SWOT analysis, and the whitespace territory PhyCap can own."
       />

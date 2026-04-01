@@ -25,7 +25,7 @@ export default function IdentityTab() {
   return (
     <div className="p-6 max-w-5xl">
       <SectionHeader
-        number="01"
+        number="02"
         title="Brand Identity"
         subtitle="Archetype, personality, core narrative, positioning statement, and messaging hierarchy."
       />

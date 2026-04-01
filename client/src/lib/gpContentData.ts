@@ -1,5 +1,5 @@
 export const gpContentMeta = {
-  sectionNumber: "18",
+  sectionNumber: "10",
   title: "Content Network",
   subtitle:
     "Four physician personal brands multiplying the company page's reach. A coordinated content engine where each GP's clinical lens refracts the same thesis into four distinct markets.",

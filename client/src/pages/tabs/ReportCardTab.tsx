@@ -63,7 +63,7 @@ export default function ReportCardTab() {
   return (
     <div className="p-6 max-w-5xl">
       <SectionHeader
-        number="17"
+        number="13"
         title="Report Card"
         subtitle="Section-by-section completion tracker for the Brand Strategy Vault."
       />

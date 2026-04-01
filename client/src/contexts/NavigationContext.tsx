@@ -1,25 +1,19 @@
 import React, { createContext, useContext, useState, type ReactNode } from "react";
 
 export type TabId =
-  | "overview"
-  | "company"
-  | "gap"
+  | "dashboard"
   | "identity"
-  | "visual"
-  | "verbal"
-  | "thesis"
-  | "audience"
+  | "designsystem"
+  | "voice"
+  | "gaps"
+  | "audiencejourney"
   | "competitive"
-  | "journey"
-  | "digital"
-  | "gtm"
-  | "product"
+  | "thesisportfolio"
+  | "gtmdigital"
+  | "gpcontent"
   | "revenue"
-  | "portfolio"
-  | "actions"
-  | "decisions"
-  | "reportcard"
-  | "gpcontent";
+  | "actionsdecisions"
+  | "reportcard";
 
 interface NavigationContextType {
   activeTab: TabId;
@@ -29,7 +23,7 @@ interface NavigationContextType {
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
 
 export function NavigationProvider({ children }: { children: ReactNode }) {
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [activeTab, setActiveTab] = useState<TabId>("dashboard");
   return (
     <NavigationContext.Provider value={{ activeTab, setActiveTab }}>
       {children}

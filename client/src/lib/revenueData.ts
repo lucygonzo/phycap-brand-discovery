@@ -1,5 +1,5 @@
 export const revenueMeta = {
-  sectionNumber: "15",
+  sectionNumber: "11",
   title: "Revenue Model",
   subtitle:
     "Standard VC fund economics applied to PhyCap Fund I. Management fees fund operations; carried interest aligns GP incentives with LP returns over the long term.",

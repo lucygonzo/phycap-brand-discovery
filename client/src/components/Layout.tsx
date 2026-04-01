@@ -1,9 +1,10 @@
 import { useState } from "react";
 import {
-  BarChart3, Building2, AlertCircle, Fingerprint, Palette, MessageSquare,
-  Target, Users, Swords, Route, Globe, Rocket, TrendingUp, DollarSign,
-  Briefcase, CheckSquare, BookOpen, ClipboardCheck, Mic2, Menu, X, Moon, Sun,
-  FileText,
+  LayoutDashboard, Fingerprint, Palette, MessageSquare, AlertCircle,
+  Users, Swords, Target,
+  Rocket, Mic2, DollarSign,
+  CheckSquare, ClipboardCheck,
+  Menu, X, Moon, Sun, FileText,
 } from "lucide-react";
 import { Link } from "wouter";
 import type { TabId } from "../contexts/NavigationContext";
@@ -25,47 +26,36 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    label: "FOUNDATION",
-    items: [
-      { id: "overview", label: "Overview", icon: <BarChart3 size={16} /> },
-      { id: "company", label: "Company", icon: <Building2 size={16} /> },
-      { id: "gap", label: "Gap Analysis", icon: <AlertCircle size={16} /> },
-    ],
-  },
-  {
     label: "BRAND",
     items: [
+      { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
       { id: "identity", label: "Identity", icon: <Fingerprint size={16} /> },
-      { id: "visual", label: "Visual", icon: <Palette size={16} /> },
-      { id: "verbal", label: "Verbal", icon: <MessageSquare size={16} /> },
+      { id: "designsystem", label: "Design System", icon: <Palette size={16} /> },
+      { id: "voice", label: "Voice", icon: <MessageSquare size={16} /> },
+      { id: "gaps", label: "Gaps", icon: <AlertCircle size={16} /> },
     ],
   },
   {
     label: "MARKET",
     items: [
-      { id: "thesis", label: "Investment Thesis", icon: <Target size={16} /> },
-      { id: "audience", label: "Audience", icon: <Users size={16} /> },
+      { id: "audiencejourney", label: "Audience & Journey", icon: <Users size={16} /> },
       { id: "competitive", label: "Competitive", icon: <Swords size={16} /> },
-      { id: "journey", label: "Journey", icon: <Route size={16} /> },
+      { id: "thesisportfolio", label: "Thesis & Portfolio", icon: <Target size={16} /> },
     ],
   },
   {
-    label: "BUSINESS",
+    label: "GROWTH",
     items: [
-      { id: "digital", label: "Digital", icon: <Globe size={16} /> },
-      { id: "gtm", label: "Go-to-Market", icon: <Rocket size={16} /> },
-      { id: "product", label: "Strategy", icon: <TrendingUp size={16} /> },
-      { id: "revenue", label: "Revenue", icon: <DollarSign size={16} /> },
-      { id: "portfolio", label: "Portfolio", icon: <Briefcase size={16} /> },
-    ],
-  },
-  {
-    label: "WORKSPACE",
-    items: [
-      { id: "actions", label: "Actions", icon: <CheckSquare size={16} /> },
-      { id: "decisions", label: "Decisions", icon: <BookOpen size={16} /> },
-      { id: "reportcard", label: "Report Card", icon: <ClipboardCheck size={16} /> },
+      { id: "gtmdigital", label: "Go-to-Market", icon: <Rocket size={16} /> },
       { id: "gpcontent", label: "Content Network", icon: <Mic2 size={16} /> },
+      { id: "revenue", label: "Revenue", icon: <DollarSign size={16} /> },
+    ],
+  },
+  {
+    label: "OPS",
+    items: [
+      { id: "actionsdecisions", label: "Actions & Decisions", icon: <CheckSquare size={16} /> },
+      { id: "reportcard", label: "Report Card", icon: <ClipboardCheck size={16} /> },
     ],
   },
 ];
