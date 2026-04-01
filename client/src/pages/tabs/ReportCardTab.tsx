@@ -171,15 +171,33 @@ export default function ReportCardTab() {
       <SectionHeader
         number="13"
         title="Report Card"
-        subtitle="Section-by-section completion tracker with context on ratings and improvement paths."
+        subtitle="How ready is this Brand HQ to guide real decisions."
       />
+
+      {/* Framing block */}
+      <div
+        className="rounded-lg p-4 mb-6"
+        style={{ background: "var(--muted)", border: "1px solid var(--border)" }}
+      >
+        <div className="flex items-start gap-3">
+          <ClipboardCheck size={18} className="flex-shrink-0 mt-0.5" style={{ color: "var(--phycap-gold)" }} />
+          <div>
+            <p className="text-sm font-medium mb-1.5" style={{ color: "var(--foreground)" }}>
+              This tracks the Brand HQ deliverable, not PhyCap's brand health.
+            </p>
+            <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+              A section at 45% means our documentation still has gaps that need your input or asset delivery to close. It does not mean that area of PhyCap's brand is weak. The actual brand health assessment lives in the <strong>Gaps</strong> tab, where perception scores and funnel audits evaluate PhyCap as a company. This page answers a different question: "How complete is each section of this Brand HQ as a working tool for Kate and the team?"
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Overall stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <StatCard value={`${overallCompletion}%`} label="Overall Completion" note="Average across all 13 sections." accent />
-        <StatCard value={`${greenCount}`} label="Strong (70%+)" note="Ready or near-ready for use." />
-        <StatCard value={`${amberCount}`} label="In Progress (40-69%)" note="Foundation built, needs input." />
-        <StatCard value={`${redCount}`} label="Early Stage (<40%)" note="Structural framework, gaps remain." />
+        <StatCard value={`${overallCompletion}%`} label="Deliverable Readiness" note="Average documentation completeness across all 13 sections." accent />
+        <StatCard value={`${greenCount}`} label="Ready to Use (70%+)" note="These sections can guide decisions today." />
+        <StatCard value={`${amberCount}`} label="Needs Input (40-69%)" note="Foundation built. Waiting on Kate, GPs, or asset delivery." />
+        <StatCard value={`${redCount}`} label="In Development (<40%)" note="Framework in place. Requires confirmed data or approvals to complete." />
       </div>
 
       {/* Filter pills */}
@@ -270,13 +288,13 @@ export default function ReportCardTab() {
       >
         <ClipboardCheck size={12} style={{ color: "var(--phycap-gold)" }} />
         <span className="flex items-center gap-1.5">
-          <CheckCircle2 size={10} style={{ color: "oklch(0.55 0.18 145)" }} /> 70%+ Strong
+          <CheckCircle2 size={10} style={{ color: "oklch(0.55 0.18 145)" }} /> 70%+ Ready to use
         </span>
         <span className="flex items-center gap-1.5">
-          <TrendingUp size={10} style={{ color: "oklch(0.70 0.15 70)" }} /> 40-69% In Progress
+          <TrendingUp size={10} style={{ color: "oklch(0.70 0.15 70)" }} /> 40-69% Needs input
         </span>
         <span className="flex items-center gap-1.5">
-          <AlertTriangle size={10} style={{ color: "oklch(0.55 0.20 25)" }} /> Below 40% Early
+          <AlertTriangle size={10} style={{ color: "oklch(0.55 0.20 25)" }} /> Below 40% In development
         </span>
       </div>
     </div>
