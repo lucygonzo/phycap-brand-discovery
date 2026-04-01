@@ -11,17 +11,24 @@ import {
   KeyTakeaway,
   Card,
   StatCard,
-  Divider,
   SubTitle,
   DataTable,
   ScoreBar,
   Badge,
   HighlightBlock,
 } from "@/components/BrandComponents";
+import SubTabNav from "@/components/SubTabNav";
 import { BarChart3, AlertTriangle, Gauge, List } from "lucide-react";
 
 const severityVariant = (s: string) =>
   s === "Critical" ? "red" as const : s === "High" ? "amber" as const : s === "Medium" ? "blue" as const : "muted" as const;
+
+const subTabs = [
+  { id: "scores", label: "Perception Scores" },
+  { id: "lp-funnel", label: "LP Funnel" },
+  { id: "founder-funnel", label: "Founder Funnel" },
+  { id: "inventory", label: "Gap Inventory" },
+];
 
 export default function GapTab() {
   return (
@@ -32,75 +39,116 @@ export default function GapTab() {
         subtitle="Perception scores, funnel audits, and a prioritized inventory of brand gaps."
       />
 
-      {/* Perception Banner */}
       <KeyTakeaway label="PERCEPTION SUMMARY" text={perceptionBanner} />
 
-      {/* Average score */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-        <StatCard value={averageScore.toString()} label="Average Perception Score" note="Out of 10. Amber zone." accent />
-        <StatCard value="2" label="Critical Gaps" note="MHCDS invisible. Conversion pages inaccessible." />
-        <StatCard value="4" label="High-Priority Gaps" note="Contact email, portfolio, positioning, diligence process." />
-        <StatCard value="7" label="Total Gaps Remaining" note="6 medium, 1 low (resolved)." />
+      <SubTabNav tabs={subTabs} defaultTab="scores">
+        {(active) => {
+          if (active === "scores") return <ScoresPane />;
+          if (active === "lp-funnel") return <FunnelPane funnelIndex={0} />;
+          if (active === "founder-funnel") return <FunnelPane funnelIndex={1} />;
+          if (active === "inventory") return <InventoryPane />;
+          return null;
+        }}
+      </SubTabNav>
+    </div>
+  );
+}
+
+/* ---- Perception Scores (compact dashboard) ---- */
+function ScoresPane() {
+  return (
+    <div>
+      {/* Stat summary row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-5">
+        <StatCard value={averageScore.toString()} label="Average Score" note="Out of 10. Amber zone." accent />
+        <StatCard value="2" label="Critical Gaps" />
+        <StatCard value="4" label="High-Priority" />
+        <StatCard value="7" label="Total Remaining" />
       </div>
 
-      <Divider />
-
-      {/* Perception Scores */}
-      <SubTitle icon={<Gauge size={16} />}>Perception Dimension Scores</SubTitle>
-      <div className="mb-8">
+      {/* Compact score bars */}
+      <SubTitle icon={<Gauge size={16} />}>Dimension Scores</SubTitle>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-0 mb-5">
         {perceptionScores.map((ps, i) => (
           <ScoreBar key={i} label={ps.dimension} score={ps.score} />
         ))}
       </div>
 
-      {/* Score detail cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      {/* Detail cards in tighter grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {perceptionScores.map((ps, i) => (
           <Card
             key={i}
             title={`${ps.dimension} (${ps.score}/10)`}
             variant={ps.score >= 6 ? "forest" : ps.score >= 4 ? "gold" : "red"}
           >
-            <div className="space-y-2">
-              <p>{ps.summary}</p>
-              <HighlightBlock variant="gold" label="TO IMPROVE">
-                <p>{ps.toImprove}</p>
-              </HighlightBlock>
-            </div>
+            <p className="mb-2">{ps.summary}</p>
+            <HighlightBlock variant="gold" label="TO IMPROVE">
+              <p>{ps.toImprove}</p>
+            </HighlightBlock>
           </Card>
         ))}
       </div>
+    </div>
+  );
+}
 
-      <Divider />
+/* ---- Funnel Pane (reused for LP and Founder) ---- */
+function FunnelPane({ funnelIndex }: { funnelIndex: number }) {
+  const funnel = funnelAudits[funnelIndex];
+  if (!funnel) return null;
 
-      {/* Funnel Audits */}
-      <SubTitle icon={<BarChart3 size={16} />}>Funnel Audits</SubTitle>
-      {funnelAudits.map((funnel, fi) => (
-        <div key={fi} className="mb-8">
-          <h3 className="font-medium text-sm mb-4" style={{ color: "var(--foreground)" }}>
-            {funnel.funnel}
-          </h3>
-          <DataTable
-            headers={["Stage", "Severity", "Detail"]}
-            rows={funnel.stages.map((s) => [s.stage, s.severity, s.detail])}
-          />
-          <div className="flex flex-wrap gap-2 mt-3">
-            {funnel.stages.map((s, si) => (
-              <Badge key={si} variant={severityVariant(s.severity)}>
-                {s.stage}: {s.severity}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      ))}
+  return (
+    <div>
+      <SubTitle icon={<BarChart3 size={16} />}>{funnel.funnel}</SubTitle>
 
-      <Divider />
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {funnel.stages.map((s, si) => (
+          <Badge key={si} variant={severityVariant(s.severity)}>
+            {s.stage}: {s.severity}
+          </Badge>
+        ))}
+      </div>
 
-      {/* Gap Inventory */}
+      <DataTable
+        headers={["Stage", "Severity", "Detail"]}
+        rows={funnel.stages.map((s) => [s.stage, s.severity, s.detail])}
+      />
+
+      {/* Highest-priority fixes relevant to this funnel */}
+      <SubTitle icon={<AlertTriangle size={16} />}>Priority Fixes</SubTitle>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {funnelIndex === 0 ? (
+          <>
+            <Card title="Resolve INVEST page accessibility" variant="red">
+              <p>Conversion endpoint is not publicly reachable. Revenue-impacting.</p>
+            </Card>
+            <Card title="Build LP qualification mechanism" variant="red">
+              <p>Post-signup nurture, FAQ, and "What to Expect" content needed.</p>
+            </Card>
+          </>
+        ) : (
+          <>
+            <Card title="Resolve PITCH page accessibility" variant="red">
+              <p>No submission path visible. Blocks structured deal flow intake.</p>
+            </Card>
+            <Card title="Create founder-facing diligence content" variant="amber">
+              <p>Explain the diligence process publicly so founders can self-qualify.</p>
+            </Card>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Gap Inventory ---- */
+function InventoryPane() {
+  return (
+    <div>
       <SubTitle icon={<List size={16} />}>Gap Inventory (13 Total)</SubTitle>
 
-      {/* Severity summary */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-5">
         {gapSeveritySummary.map((s, i) => (
           <StatCard
             key={i}
@@ -112,18 +160,17 @@ export default function GapTab() {
         ))}
       </div>
 
-      {/* Individual gaps */}
-      <div className="space-y-4 mb-8">
+      <div className="space-y-3">
         {gapInventory.map((gap) => (
           <Card
             key={gap.id}
             title={`Gap ${gap.id}: ${gap.title}`}
             variant={gap.severity === "Critical" ? "red" : gap.severity === "High" ? "amber" : "default"}
           >
-            <div className="space-y-2">
-              <div className="flex gap-2 mb-2">
-                <Badge variant={severityVariant(gap.severity)}>{gap.severity}</Badge>
-              </div>
+            <div className="flex gap-2 mb-2">
+              <Badge variant={severityVariant(gap.severity)}>{gap.severity}</Badge>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               <HighlightBlock label="CURRENT STATE">
                 <p>{gap.currentState}</p>
               </HighlightBlock>
@@ -136,24 +183,6 @@ export default function GapTab() {
             </div>
           </Card>
         ))}
-      </div>
-
-      <Divider />
-
-      <SubTitle icon={<AlertTriangle size={16} />}>Highest-Priority Fixes</SubTitle>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <Card title="1. Resolve INVEST and PITCH page accessibility" variant="red">
-          <p>Both funnels' critical conversion endpoints are not publicly reachable. Revenue-impacting.</p>
-        </Card>
-        <Card title="2. Build LP qualification mechanism" variant="red">
-          <p>Post-signup nurture, FAQ, and "What to Expect" content to move physicians from interested to qualified.</p>
-        </Card>
-        <Card title="3. Clarify CTA hierarchy per audience" variant="amber">
-          <p>Reduce choice paralysis at the qualification stage. One primary CTA per audience per page.</p>
-        </Card>
-        <Card title="4. Create founder-facing diligence content" variant="amber">
-          <p>Explain the diligence process publicly. Make "Investing with Clinical Precision" observable, not just a tagline.</p>
-        </Card>
       </div>
     </div>
   );

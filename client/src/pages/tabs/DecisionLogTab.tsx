@@ -7,15 +7,18 @@ import {
 import {
   SectionHeader,
   KeyTakeaway,
-  Card,
   StatCard,
-  Divider,
   SubTitle,
-  DataTable,
   Badge,
   HighlightBlock,
 } from "@/components/BrandComponents";
-import { CheckCircle, Clock, Users, Shield } from "lucide-react";
+import SubTabNav, { ExpandableCard } from "@/components/SubTabNav";
+import { CheckCircle, Clock, Users } from "lucide-react";
+
+const subTabs = [
+  { id: "confirmed", label: "Confirmed" },
+  { id: "pending", label: "Pending" },
+];
 
 export default function DecisionLogTab() {
   return (
@@ -27,90 +30,96 @@ export default function DecisionLogTab() {
       />
 
       {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-        <StatCard value="7" label="Confirmed Decisions" note="Final unless explicitly reopened by Kate or GP team." accent />
-        <StatCard value="7" label="Pending Decisions" note="Recommended directions applied. Awaiting Kate on April 3." />
-        <StatCard value="Apr 3" label="Kate Meeting" note="Target resolution date for all pending decisions." />
-        <StatCard value="4" label="Decision Owners" note="Kate, Paul, individual GPs, and Dutch Rojas." />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <StatCard value="7" label="Confirmed Decisions" note="Final unless explicitly reopened." accent />
+        <StatCard value="7" label="Pending Decisions" note="Awaiting Kate on April 3." />
+        <StatCard value="Apr 3" label="Kate Meeting" note="Target resolution date." />
+        <StatCard value="4" label="Decision Owners" note="Kate, Paul, GPs, Dutch." />
       </div>
 
       <KeyTakeaway label="KEY TAKEAWAY" text={decisionLogMeta.keyTakeaway} />
 
-      <Divider />
+      <SubTabNav tabs={subTabs} defaultTab="confirmed">
+        {(active) => {
+          if (active === "confirmed") return <ConfirmedPane />;
+          if (active === "pending") return <PendingPane />;
+          return null;
+        }}
+      </SubTabNav>
 
-      {/* Confirmed Decisions */}
-      <SubTitle icon={<CheckCircle size={16} />}>Confirmed Decisions</SubTitle>
-      <div className="space-y-3 mb-8">
-        {confirmedDecisions.map((d) => (
-          <Card key={d.id} title={d.title} variant="forest">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <Badge variant="green">Confirmed</Badge>
-              <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>{d.date}</span>
-              <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>| {d.owner}</span>
-            </div>
-            <p>{d.summary}</p>
-          </Card>
-        ))}
-      </div>
-
-      <Divider />
-
-      {/* Pending Decisions */}
-      <SubTitle icon={<Clock size={16} />}>Pending Decisions</SubTitle>
-      <HighlightBlock variant="amber" label="AWAITING KATE MEETING, APRIL 3">
-        <p>
-          Best-guess recommendations are applied to all items and proceeding as if confirmed.
-          Kate should confirm or adjust on Friday. Items will be promoted to confirmed after approval.
-        </p>
-      </HighlightBlock>
-
-      <div className="space-y-3 mt-4 mb-8">
-        {pendingDecisions.map((d) => (
-          <Card key={d.id} title={d.title} variant="amber">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <Badge variant="amber">Pending</Badge>
-              <Badge variant={d.urgency === "High" ? "red" : d.urgency === "Medium" ? "amber" : "muted"}>
-                {d.urgency} Urgency
-              </Badge>
-              <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>{d.owner}</span>
-            </div>
-            <p className="mb-2">{d.description}</p>
-            <div className="flex flex-wrap items-center gap-2 mt-3">
-              <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>Recommendation:</span>
-              <Badge variant="blue">{d.recommendation}</Badge>
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>Friday Action:</span>
-              <span className="text-xs" style={{ color: "var(--foreground)" }}>{d.fridayAction}</span>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      <Divider />
-
-      {/* Decision Tracking Table */}
-      <SubTitle icon={<Shield size={16} />}>Decision Tracking Summary</SubTitle>
-      <DataTable
-        headers={["#", "Decision", "Owner", "Status", "Kate Action Friday"]}
-        rows={pendingDecisions.map((d) => [
-          String(d.id),
-          d.title,
-          d.owner,
-          `Recommended: ${d.recommendation}`,
-          d.fridayAction,
-        ])}
-      />
-
-      <Divider />
-
-      {/* Decision Authority */}
+      {/* Decision Authority (always visible) */}
       <SubTitle icon={<Users size={16} />}>Decision Authority</SubTitle>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
         {decisionAuthority.map((da, i) => (
           <HighlightBlock key={i} variant="forest" label={da.person.toUpperCase()}>
             <p>{da.scope}</p>
           </HighlightBlock>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Confirmed ---- */
+function ConfirmedPane() {
+  return (
+    <div>
+      <SubTitle icon={<CheckCircle size={16} />}>Confirmed Decisions</SubTitle>
+      <div className="space-y-2">
+        {confirmedDecisions.map((d) => (
+          <ExpandableCard
+            key={d.id}
+            title={d.title}
+            subtitle={`${d.date} | ${d.owner}`}
+            badge={<Badge variant="green">Confirmed</Badge>}
+          >
+            <p>{d.summary}</p>
+          </ExpandableCard>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Pending ---- */
+function PendingPane() {
+  return (
+    <div>
+      <SubTitle icon={<Clock size={16} />}>Pending Decisions</SubTitle>
+      <HighlightBlock variant="amber" label="AWAITING KATE MEETING, APRIL 3">
+        <p>
+          Best-guess recommendations are applied and proceeding as if confirmed.
+          Kate should confirm or adjust on Friday.
+        </p>
+      </HighlightBlock>
+
+      <div className="space-y-2 mt-4">
+        {pendingDecisions.map((d) => (
+          <ExpandableCard
+            key={d.id}
+            title={d.title}
+            subtitle={d.owner}
+            badge={
+              <div className="flex gap-1.5">
+                <Badge variant="amber">Pending</Badge>
+                <Badge variant={d.urgency === "High" ? "red" : d.urgency === "Medium" ? "amber" : "muted"}>
+                  {d.urgency}
+                </Badge>
+              </div>
+            }
+          >
+            <div className="space-y-2">
+              <p>{d.description}</p>
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>Recommendation:</span>
+                <Badge variant="blue">{d.recommendation}</Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>Friday Action:</span>
+                <span className="text-xs" style={{ color: "var(--foreground)" }}>{d.fridayAction}</span>
+              </div>
+            </div>
+          </ExpandableCard>
         ))}
       </div>
     </div>

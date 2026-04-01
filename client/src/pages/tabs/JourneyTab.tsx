@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   lpJourney,
   founderJourney,
@@ -9,72 +10,27 @@ import {
   SectionHeader,
   KeyTakeaway,
   Card,
-  Divider,
   SubTitle,
   Badge,
   DataTable,
   HighlightBlock,
 } from "@/components/BrandComponents";
-import { Route, UserCheck, Briefcase, AlertTriangle } from "lucide-react";
+import SubTabNav, { JourneyFlow } from "@/components/SubTabNav";
+import { AlertTriangle } from "lucide-react";
 
-const stageColors: Record<string, "green" | "blue" | "gold" | "amber" | "red" | "muted"> = {
-  Awareness: "blue",
-  Consideration: "gold",
-  Decision: "amber",
-  Onboarding: "green",
-  Retention: "muted",
+const subTabs = [
+  { id: "lp", label: "Physician LP Journey" },
+  { id: "founder", label: "Founder Journey" },
+];
+
+const stageStatus: Record<string, "green" | "amber" | "red"> = {
+  Awareness: "amber",
+  Consideration: "red",
+  Decision: "red",
+  Onboarding: "amber",
+  Retention: "amber",
   Advocacy: "green",
 };
-
-function JourneyStageCard({ stage, index }: { stage: JourneyStage; index: number }) {
-  const badgeVariant = stageColors[stage.stage] || "muted";
-  return (
-    <div
-      className="rounded-lg p-4"
-      style={{ background: "var(--card)", border: "1px solid var(--border)" }}
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <div
-          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-          style={{ background: "var(--phycap-forest)", color: "var(--phycap-gold)" }}
-        >
-          {index + 1}
-        </div>
-        <Badge variant={badgeVariant}>{stage.stage}</Badge>
-      </div>
-
-      <p className="italic text-xs mb-3" style={{ color: "var(--muted-foreground)", lineHeight: 1.6 }}>
-        "{stage.mindset}"
-      </p>
-
-      <div className="mb-3">
-        <div className="text-[10px] font-medium uppercase tracking-wider mb-1.5" style={{ color: "var(--phycap-gold)" }}>Touchpoints</div>
-        <ul className="space-y-1">
-          {stage.touchpoints.map((t, i) => (
-            <li key={i} className="text-xs flex gap-1.5" style={{ color: "var(--foreground)" }}>
-              <span style={{ color: "var(--phycap-gold)", flexShrink: 0 }}>+</span>
-              <span>{t}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {stage.frictionPoints.length > 0 && (
-        <div>
-          <div className="text-[10px] font-medium uppercase tracking-wider mb-1.5" style={{ color: "oklch(0.55 0.20 25)" }}>Friction Points</div>
-          <ul className="space-y-1">
-            {stage.frictionPoints.map((f, i) => (
-              <li key={i} className="text-xs flex gap-1.5" style={{ color: "var(--muted-foreground)" }}>
-                <span style={{ color: "oklch(0.55 0.20 25)", flexShrink: 0 }}>!</span>
-                <span>{f}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function JourneyTab() {
   return (
@@ -82,90 +38,103 @@ export default function JourneyTab() {
       <SectionHeader
         number="09"
         title="Journey Maps"
-        subtitle="End-to-end journey maps for the two primary audiences: physician LPs and healthcare founders. Each journey tracks six stages from awareness through advocacy."
+        subtitle="End-to-end journey maps for physician LPs and healthcare founders. Click a stage to explore its details."
       />
 
       <KeyTakeaway label="KEY TAKEAWAY" text={journeyKeyTakeaway} />
 
-      <Divider />
+      <SubTabNav tabs={subTabs} defaultTab="lp">
+        {(active) => {
+          if (active === "lp") return <JourneyPane stages={lpJourney} variant="forest" />;
+          if (active === "founder") return <JourneyPane stages={founderJourney} variant="gold" />;
+          return null;
+        }}
+      </SubTabNav>
 
-      {/* LP Journey */}
-      <SubTitle icon={<UserCheck size={16} />}>Journey 1: Physician LP Path</SubTitle>
-      <HighlightBlock variant="forest" label="JOURNEY OVERVIEW">
-        <p className="text-xs">Six stages from first LinkedIn post encounter through active advocacy. The journey is relationship-heavy and trust-dependent. Average timeline from first touchpoint to LP commitment: 6-18 months.</p>
-      </HighlightBlock>
-
-      <div className="space-y-3 mb-8">
-        {/* Visual flow indicator */}
-        <div className="flex items-center gap-1 mb-4 overflow-x-auto pb-2">
-          {lpJourney.map((stage, i) => (
-            <div key={i} className="flex items-center">
-              <div
-                className="px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap"
-                style={{
-                  background: i === 0 ? "var(--phycap-forest)" : "var(--muted)",
-                  color: i === 0 ? "var(--phycap-gold)" : "var(--muted-foreground)",
-                  border: "1px solid var(--border)",
-                }}
-              >
-                {stage.stage}
-              </div>
-              {i < lpJourney.length - 1 && (
-                <div className="w-4 h-px mx-0.5" style={{ background: "var(--border)" }} />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {lpJourney.map((stage, i) => (
-            <JourneyStageCard key={i} stage={stage} index={i} />
-          ))}
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* Founder Journey */}
-      <SubTitle icon={<Briefcase size={16} />}>Journey 2: Healthcare Founder Path</SubTitle>
-      <HighlightBlock variant="gold" label="JOURNEY OVERVIEW">
-        <p className="text-xs">Six stages from first GP content discovery through founder referral advocacy. Founders evaluate PhyCap on clinical depth, thesis alignment, and post-investment GP engagement. The journey is faster than the LP path but more competitive.</p>
-      </HighlightBlock>
-
-      <div className="space-y-3 mb-8">
-        {/* Visual flow indicator */}
-        <div className="flex items-center gap-1 mb-4 overflow-x-auto pb-2">
-          {founderJourney.map((stage, i) => (
-            <div key={i} className="flex items-center">
-              <div
-                className="px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap"
-                style={{
-                  background: i === 0 ? "var(--phycap-forest)" : "var(--muted)",
-                  color: i === 0 ? "var(--phycap-gold)" : "var(--muted-foreground)",
-                  border: "1px solid var(--border)",
-                }}
-              >
-                {stage.stage}
-              </div>
-              {i < founderJourney.length - 1 && (
-                <div className="w-4 h-px mx-0.5" style={{ background: "var(--border)" }} />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {founderJourney.map((stage, i) => (
-            <JourneyStageCard key={i} stage={stage} index={i} />
-          ))}
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* Broken Paths */}
+      {/* Broken paths (always visible) */}
       <SubTitle icon={<AlertTriangle size={16} />}>Cross-Journey Broken Paths</SubTitle>
       <DataTable headers={brokenPaths.headers} rows={brokenPaths.rows} />
+    </div>
+  );
+}
+
+/* ---- Interactive Journey Pane ---- */
+function JourneyPane({ stages, variant }: { stages: JourneyStage[]; variant: "forest" | "gold" }) {
+  const [activeStage, setActiveStage] = useState(stages[0].stage);
+  const current = stages.find((s) => s.stage === activeStage) || stages[0];
+
+  const flowStages = stages.map((s) => ({
+    id: s.stage,
+    label: s.stage,
+    status: stageStatus[s.stage] || ("amber" as const),
+  }));
+
+  return (
+    <div>
+      {/* Horizontal step flow */}
+      <JourneyFlow
+        stages={flowStages}
+        activeStage={activeStage}
+        onStageClick={setActiveStage}
+      />
+
+      {/* Active stage detail */}
+      <Card title={current.stage} variant={variant}>
+        <p className="italic text-xs mb-4" style={{ color: "var(--muted-foreground)", lineHeight: 1.6 }}>
+          "{current.mindset}"
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* Touchpoints */}
+          <HighlightBlock variant={variant} label="TOUCHPOINTS">
+            <ul className="space-y-1">
+              {current.touchpoints.map((t, i) => (
+                <li key={i} className="text-xs flex gap-1.5">
+                  <span style={{ color: "var(--phycap-gold)", flexShrink: 0 }}>+</span>
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+          </HighlightBlock>
+
+          {/* Friction Points */}
+          {current.frictionPoints.length > 0 && (
+            <HighlightBlock variant="amber" label="FRICTION POINTS">
+              <ul className="space-y-1">
+                {current.frictionPoints.map((f, i) => (
+                  <li key={i} className="text-xs flex gap-1.5">
+                    <span style={{ color: "oklch(0.55 0.20 25)", flexShrink: 0 }}>!</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </HighlightBlock>
+          )}
+
+          {/* Content Needed */}
+          {current.contentNeeded.length > 0 && (
+            <HighlightBlock variant="gold" label="CONTENT NEEDED">
+              <ul className="space-y-1">
+                {current.contentNeeded.map((c, i) => (
+                  <li key={i} className="text-xs flex gap-1.5">
+                    <span style={{ color: "var(--phycap-gold)", flexShrink: 0 }}>+</span>
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </HighlightBlock>
+          )}
+        </div>
+      </Card>
+
+      {/* Mini stage overview badges */}
+      <div className="flex flex-wrap gap-1.5 mt-4">
+        {stages.map((s, i) => (
+          <Badge key={i} variant={stageStatus[s.stage] === "green" ? "green" : stageStatus[s.stage] === "red" ? "red" : "amber"}>
+            {s.stage}: {s.frictionPoints.length} friction
+          </Badge>
+        ))}
+      </div>
     </div>
   );
 }

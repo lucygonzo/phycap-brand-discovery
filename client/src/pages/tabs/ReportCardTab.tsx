@@ -1,15 +1,10 @@
+import { useState } from "react";
 import {
   SectionHeader,
-  KeyTakeaway,
   StatCard,
-  Divider,
-  SubTitle,
-  ScoreBar,
   Badge,
-  Card,
-  HighlightBlock,
 } from "@/components/BrandComponents";
-import { ClipboardCheck, TrendingUp, AlertCircle } from "lucide-react";
+import { ClipboardCheck } from "lucide-react";
 
 const sections = [
   { name: "00 Overview", completion: 75, blocker: "Kate Input" },
@@ -37,115 +32,128 @@ const overallCompletion = Math.round(
   sections.reduce((sum, s) => sum + s.completion, 0) / sections.length
 );
 
-const readyAfterKate = ["00 Overview", "01 Identity", "02 Company", "04 Verbal", "13 Workspace", "14 Gap Analysis", "16 Decision Log", "17 Report Card"];
-const needsSiteInspection = ["03 Visual", "08 Digital"];
-const needsGPInterviews = ["05 Services", "06 Audience", "09 Go-to-Market", "10 Journey", "15 Revenue Model", "18 GP Content"];
+type BlockerFilter = "all" | "Kate Input" | "Site Inspection" | "GP Interviews";
+
+const blockerFilters: { label: string; value: BlockerFilter }[] = [
+  { label: "All", value: "all" },
+  { label: "Kate Input", value: "Kate Input" },
+  { label: "Site Inspection", value: "Site Inspection" },
+  { label: "GP Interviews", value: "GP Interviews" },
+];
+
+function completionColor(pct: number): string {
+  if (pct >= 70) return "oklch(0.55 0.18 145)";
+  if (pct >= 40) return "oklch(0.70 0.15 70)";
+  return "oklch(0.55 0.20 25)";
+}
+
+function completionBadge(pct: number): "green" | "amber" | "red" {
+  if (pct >= 70) return "green";
+  if (pct >= 40) return "amber";
+  return "red";
+}
 
 export default function ReportCardTab() {
+  const [filter, setFilter] = useState<BlockerFilter>("all");
+
+  const filtered = filter === "all"
+    ? sections
+    : sections.filter((s) => s.blocker.includes(filter));
+
   return (
     <div className="p-6 max-w-5xl">
       <SectionHeader
         number="17"
         title="Report Card"
-        subtitle="Section-by-section completion tracker for the Brand Strategy Vault. Scores reflect professional judgment based on raw discovery data, research, and confirmed decisions."
+        subtitle="Section-by-section completion tracker for the Brand Strategy Vault."
       />
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+      {/* Large overall stat + summary row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard value={`${overallCompletion}%`} label="Overall Vault Completion" note="Average across all 19 sections." accent />
-        <StatCard value="19" label="Total Sections" note="From Overview (00) through GP Content (18)." />
-        <StatCard value="8" label="Ready After Kate Meeting" note="Can be finalized once Kate approves on April 3." />
-        <StatCard value="6" label="Need GP Interviews" note="Require direct input from one or more GPs." />
+        <StatCard value="19" label="Total Sections" note="Overview (00) through GP Content (18)." />
+        <StatCard value="8" label="Ready After Kate Meeting" note="Can be finalized after April 3." />
+        <StatCard value="6" label="Need GP Interviews" note="Require direct GP input." />
       </div>
 
-      <KeyTakeaway
-        label="KEY TAKEAWAY"
-        text="The vault is approximately 52% complete. The Kate meeting on April 3 is the single largest unlock: eight sections can move to finalization immediately after. The lowest-scoring sections (Journey 30%, Digital 30%, Revenue 25%, Portfolio 20%) have the most dependencies and longest lead times."
-      />
+      {/* Filterable pills */}
+      <div className="flex flex-wrap gap-1.5 mb-5">
+        {blockerFilters.map((bf) => {
+          const isActive = filter === bf.value;
+          return (
+            <button
+              key={bf.value}
+              onClick={() => setFilter(bf.value)}
+              className="px-3 py-1.5 rounded-full text-[11px] font-medium transition-all"
+              style={{
+                background: isActive ? "var(--card)" : "var(--muted)",
+                color: isActive ? "var(--phycap-gold)" : "var(--muted-foreground)",
+                border: isActive ? "1px solid var(--phycap-gold)" : "1px solid var(--border)",
+              }}
+            >
+              {bf.label}
+              {bf.value !== "all" && (
+                <span className="ml-1.5 opacity-60">
+                  ({sections.filter((s) => s.blocker.includes(bf.value)).length})
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
 
-      <Divider />
+      {/* 3-column compact grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 mb-6">
+        {filtered.map((s, i) => (
+          <div
+            key={i}
+            className="rounded-lg p-3"
+            style={{ background: "var(--card)", border: "1px solid var(--border)" }}
+          >
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium truncate" style={{ color: "var(--foreground)" }}>
+                {s.name}
+              </span>
+              <span
+                className="mono-font text-xs font-bold flex-shrink-0 ml-2"
+                style={{ color: completionColor(s.completion) }}
+              >
+                {s.completion}%
+              </span>
+            </div>
 
-      {/* Completion Bars */}
-      <SubTitle icon={<ClipboardCheck size={16} />}>Section-by-Section Completion</SubTitle>
-      <div className="mb-8">
-        {sections.map((s, i) => (
-          <ScoreBar key={i} label={s.name} score={s.completion / 10} max={10} />
+            {/* Mini progress bar */}
+            <div className="h-1.5 rounded-full mb-2" style={{ background: "var(--muted)" }}>
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${s.completion}%`, background: completionColor(s.completion) }}
+              />
+            </div>
+
+            {/* Blocker badge */}
+            <Badge variant={completionBadge(s.completion)}>
+              {s.blocker}
+            </Badge>
+          </div>
         ))}
       </div>
 
-      <Divider />
-
-      {/* Blocker Details */}
-      <SubTitle icon={<AlertCircle size={16} />}>Blocker Analysis</SubTitle>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Card title="Ready After Kate Meeting" variant="forest">
-          <p className="mb-3 text-xs" style={{ color: "var(--muted-foreground)" }}>
-            8 sections can be finalized once decisions are approved on April 3.
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {readyAfterKate.map((s, i) => (
-              <Badge key={i} variant="green">{s}</Badge>
-            ))}
-          </div>
-        </Card>
-
-        <Card title="Need Site Inspection" variant="amber">
-          <p className="mb-3 text-xs" style={{ color: "var(--muted-foreground)" }}>
-            2 sections require live site audit data not yet collected.
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {needsSiteInspection.map((s, i) => (
-              <Badge key={i} variant="amber">{s}</Badge>
-            ))}
-          </div>
-        </Card>
-
-        <Card title="Need GP Interviews" variant="gold">
-          <p className="mb-3 text-xs" style={{ color: "var(--muted-foreground)" }}>
-            6 sections require direct input from one or more GPs.
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {needsGPInterviews.map((s, i) => (
-              <Badge key={i} variant="gold">{s}</Badge>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      <Divider />
-
-      {/* Priority Sections */}
-      <SubTitle icon={<TrendingUp size={16} />}>Priority Focus Areas</SubTitle>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <HighlightBlock variant="amber" label="HIGHEST RISK">
-          <p className="font-medium mb-1">Sections 09 (Go-to-Market) and 10 (Journey)</p>
-          <p>
-            Lowest completion (35% and 30%) with the most dependencies. These are the most complex sections
-            and may require multiple rounds of input. Flag as long-lead items.
-          </p>
-        </HighlightBlock>
-
-        <HighlightBlock variant="amber" label="HIGHEST IMPACT">
-          <p className="font-medium mb-1">Section 12 (Portfolio) at 20%</p>
-          <p>
-            BioReact is the only confirmed company. Portfolio credibility gap is one of PhyCap's
-            top brand challenges. Requires Kate input and company coordination.
-          </p>
-        </HighlightBlock>
-
-        <HighlightBlock variant="forest" label="NEAR COMPLETE">
-          <p className="font-medium mb-1">Section 17 (Report Card) at 90%</p>
-          <p>
-            This tracker. Needs post-Kate-meeting updated scores and quarterly review schedule.
-          </p>
-        </HighlightBlock>
-
-        <HighlightBlock variant="forest" label="NEAR COMPLETE">
-          <p className="font-medium mb-1">Section 16 (Decision Log) at 85%</p>
-          <p>
-            Confirmed and pending decisions cataloged. Needs historical decision context and meeting notes.
-          </p>
-        </HighlightBlock>
+      {/* Compact icon legend */}
+      <div
+        className="flex items-center gap-4 px-4 py-2.5 rounded-lg text-[10px]"
+        style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}
+      >
+        <ClipboardCheck size={12} style={{ color: "var(--phycap-gold)" }} />
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full" style={{ background: "oklch(0.55 0.18 145)" }} /> 70%+
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full" style={{ background: "oklch(0.70 0.15 70)" }} /> 40-69%
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full" style={{ background: "oklch(0.55 0.20 25)" }} /> Below 40%
+        </span>
       </div>
     </div>
   );

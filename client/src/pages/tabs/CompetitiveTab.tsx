@@ -16,7 +16,8 @@ import {
   DataTable,
   HighlightBlock,
 } from "@/components/BrandComponents";
-import { Shield, Swords, Grid3X3, Crosshair, TrendingUp, AlertTriangle, Lightbulb, Target } from "lucide-react";
+import SubTabNav from "@/components/SubTabNav";
+import { Shield, Swords, Grid3X3, Crosshair, Target } from "lucide-react";
 
 const gold = "var(--phycap-gold)";
 
@@ -25,20 +26,13 @@ function ThreatBadge({ level }: { level: string }) {
   return <Badge variant={variant}>{level}</Badge>;
 }
 
-export default function CompetitiveTab() {
-  return (
-    <div className="p-6 max-w-5xl">
-      <SectionHeader
-        number="08"
-        title="Competitive Landscape"
-        subtitle="Direct competitors, positioning matrix, SWOT analysis, and the whitespace territory PhyCap can own."
-      />
+/* ---- Sub-tab content sections ---- */
 
+function LandscapeContent() {
+  return (
+    <>
       <KeyTakeaway label="KEY TAKEAWAY" text={competitiveKeyTakeaway} />
 
-      <Divider />
-
-      {/* Competitive Density */}
       <SubTitle icon={<Swords size={16} />}>Competitive Density Map</SubTitle>
       <div className="overflow-x-auto rounded-lg mb-8" style={{ border: "1px solid var(--border)" }}>
         <table className="w-full text-sm">
@@ -61,18 +55,17 @@ export default function CompetitiveTab() {
         </table>
       </div>
 
-      <Divider />
-
-      {/* Scrub Capital Head-to-Head */}
       <SubTitle icon={<Crosshair size={16} />}>Head-to-Head: PhyCap vs. Scrub Capital</SubTitle>
       <DataTable headers={scrubComparison.headers} rows={scrubComparison.rows} />
+    </>
+  );
+}
 
-      <Divider />
-
-      {/* SWOT 2x2 Grid */}
+function SwotContent() {
+  return (
+    <>
       <SubTitle icon={<Grid3X3 size={16} />}>SWOT Analysis</SubTitle>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        {/* Strengths */}
         <Card title="Strengths" variant="forest">
           <div className="space-y-3">
             {swotData.strengths.map((s) => (
@@ -87,7 +80,6 @@ export default function CompetitiveTab() {
           </div>
         </Card>
 
-        {/* Weaknesses */}
         <Card title="Weaknesses" variant="amber">
           <div className="space-y-3">
             {swotData.weaknesses.map((w) => (
@@ -102,7 +94,6 @@ export default function CompetitiveTab() {
           </div>
         </Card>
 
-        {/* Opportunities */}
         <Card title="Opportunities" variant="gold">
           <div className="space-y-3">
             {swotData.opportunities.map((o) => (
@@ -117,7 +108,6 @@ export default function CompetitiveTab() {
           </div>
         </Card>
 
-        {/* Threats */}
         <Card title="Threats" variant="red">
           <div className="space-y-3">
             {swotData.threats.map((t) => (
@@ -132,10 +122,13 @@ export default function CompetitiveTab() {
           </div>
         </Card>
       </div>
+    </>
+  );
+}
 
-      <Divider />
-
-      {/* Positioning Matrix */}
+function PositioningContent() {
+  return (
+    <>
       <SubTitle icon={<Target size={16} />}>Positioning Matrix</SubTitle>
       <HighlightBlock variant="forest" label="AXES">
         <div className="grid grid-cols-2 gap-4 text-xs">
@@ -150,10 +143,13 @@ export default function CompetitiveTab() {
         </div>
       </HighlightBlock>
       <DataTable headers={positioningMatrix.headers} rows={positioningMatrix.rows} />
+    </>
+  );
+}
 
-      <Divider />
-
-      {/* Whitespace */}
+function WhitespaceContent() {
+  return (
+    <>
       <SubTitle icon={<Shield size={16} />}>Whitespace: The Insider Precision Territory</SubTitle>
       <HighlightBlock variant="gold" label="THE CLAIM">
         <p className="text-sm">The intersection of specialist physician-led clinical depth and institutional investment rigor is not occupied by any competitor. This is not a theoretical brand position. The evidence shows a visible gap.</p>
@@ -175,6 +171,39 @@ export default function CompetitiveTab() {
           <div><span className="font-medium">Thesis Compounding:</span> The longer PhyCap invests in these areas, the deeper the pattern recognition</div>
         </div>
       </HighlightBlock>
+    </>
+  );
+}
+
+export default function CompetitiveTab() {
+  const subTabs = [
+    { id: "landscape", label: "Landscape" },
+    { id: "swot", label: "SWOT" },
+    { id: "positioning", label: "Positioning" },
+    { id: "whitespace", label: "Whitespace" },
+  ];
+
+  return (
+    <div className="p-6 max-w-5xl">
+      <SectionHeader
+        number="08"
+        title="Competitive Landscape"
+        subtitle="Direct competitors, positioning matrix, SWOT analysis, and the whitespace territory PhyCap can own."
+      />
+
+      <SubTabNav tabs={subTabs}>
+        {(activeSubTab) =>
+          activeSubTab === "landscape" ? (
+            <LandscapeContent />
+          ) : activeSubTab === "swot" ? (
+            <SwotContent />
+          ) : activeSubTab === "positioning" ? (
+            <PositioningContent />
+          ) : activeSubTab === "whitespace" ? (
+            <WhitespaceContent />
+          ) : null
+        }
+      </SubTabNav>
     </div>
   );
 }

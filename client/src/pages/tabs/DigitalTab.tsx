@@ -20,9 +20,9 @@ import {
   Badge,
   DataTable,
   HighlightBlock,
-  ScoreBar,
 } from "@/components/BrandComponents";
-import { Globe, Share2, FileText, Search, Layers, Users } from "lucide-react";
+import SubTabNav from "@/components/SubTabNav";
+import { Globe, Share2, FileText, Search, Users } from "lucide-react";
 
 function StatusBadge({ status }: { status: string }) {
   if (status === "Live") return <Badge variant="green">Live</Badge>;
@@ -31,20 +31,13 @@ function StatusBadge({ status }: { status: string }) {
   return <Badge variant="muted">{status}</Badge>;
 }
 
-export default function DigitalTab() {
-  return (
-    <div className="p-6 max-w-5xl">
-      <SectionHeader
-        number="10"
-        title="Digital Presence"
-        subtitle="Website audit, social media assessment, content strategy, and SEO baseline for PhyCap's digital ecosystem."
-      />
+/* ---- Sub-tab content sections ---- */
 
+function WebsiteContent() {
+  return (
+    <>
       <KeyTakeaway label="KEY TAKEAWAY" text={digitalKeyTakeaway} />
 
-      <Divider />
-
-      {/* Website Audit */}
       <SubTitle icon={<Globe size={16} />}>Website Audit</SubTitle>
       <div className="overflow-x-auto rounded-lg mb-6" style={{ border: "1px solid var(--border)" }}>
         <table className="w-full text-sm">
@@ -70,7 +63,7 @@ export default function DigitalTab() {
       <SubTitle>Missing Structural Elements</SubTitle>
       <DataTable headers={missingSiteElements.headers} rows={missingSiteElements.rows} />
 
-      <div className="mt-6 mb-8">
+      <div className="mt-6">
         <SubTitle>Website Priority Roadmap</SubTitle>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {websitePriorities.map((p, i) => (
@@ -87,10 +80,13 @@ export default function DigitalTab() {
           ))}
         </div>
       </div>
+    </>
+  );
+}
 
-      <Divider />
-
-      {/* Social Media */}
+function SocialContent() {
+  return (
+    <>
       <SubTitle icon={<Share2 size={16} />}>Social Media Audit</SubTitle>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {socialStats.map((stat, i) => (
@@ -104,16 +100,19 @@ export default function DigitalTab() {
         <SubTitle icon={<Users size={16} />}>GP Content Activation Tiers</SubTitle>
         <DataTable headers={gpContentTiers.headers} rows={gpContentTiers.rows} />
       </div>
+    </>
+  );
+}
 
-      <Divider />
-
-      {/* Content Strategy */}
+function ContentStrategyContent() {
+  return (
+    <>
       <SubTitle icon={<FileText size={16} />}>Content Pillar Framework</SubTitle>
       <HighlightBlock variant="forest" label="THE OWNERSHIP GAP">
         <p className="text-xs">When PhyCap publishes about broad AI trends, it competes with Rock Health, a16z Bio, and STAT News. PhyCap will lose. When PhyCap publishes about how a radiologist evaluates an AI diagnostic tool differently than a VC associate, it has no competition. Zero.</p>
       </HighlightBlock>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {contentPillars.map((pillar, i) => (
           <Card key={i} title={pillar.name} variant={pillar.status.includes("High Priority") ? "gold" : pillar.status.includes("Underleveraged") ? "amber" : "forest"}>
             <div className="flex gap-2 mb-2">
@@ -124,10 +123,13 @@ export default function DigitalTab() {
           </Card>
         ))}
       </div>
+    </>
+  );
+}
 
-      <Divider />
-
-      {/* SEO */}
+function SeoContent() {
+  return (
+    <>
       <SubTitle icon={<Search size={16} />}>SEO Baseline</SubTitle>
       <HighlightBlock variant="gold" label="SEO STRATEGY">
         <p className="text-xs">The strategy is not to outrank established competitors on their terms. The strategy is to own the terms they do not compete for: "physician-led venture capital," "physician venture fund," "clinical precision investing," and the intersection of clinical specialty keywords with investment keywords.</p>
@@ -140,6 +142,39 @@ export default function DigitalTab() {
         <SubTitle>SEO Timeline</SubTitle>
         <DataTable headers={seoTimeline.headers} rows={seoTimeline.rows} />
       </div>
+    </>
+  );
+}
+
+export default function DigitalTab() {
+  const subTabs = [
+    { id: "website", label: "Website" },
+    { id: "social", label: "Social" },
+    { id: "content-strategy", label: "Content Strategy" },
+    { id: "seo", label: "SEO" },
+  ];
+
+  return (
+    <div className="p-6 max-w-5xl">
+      <SectionHeader
+        number="10"
+        title="Digital Presence"
+        subtitle="Website audit, social media assessment, content strategy, and SEO baseline for PhyCap's digital ecosystem."
+      />
+
+      <SubTabNav tabs={subTabs}>
+        {(activeSubTab) =>
+          activeSubTab === "website" ? (
+            <WebsiteContent />
+          ) : activeSubTab === "social" ? (
+            <SocialContent />
+          ) : activeSubTab === "content-strategy" ? (
+            <ContentStrategyContent />
+          ) : activeSubTab === "seo" ? (
+            <SeoContent />
+          ) : null
+        }
+      </SubTabNav>
     </div>
   );
 }

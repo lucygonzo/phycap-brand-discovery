@@ -20,6 +20,7 @@ import {
   HighlightBlock,
   Badge,
 } from "@/components/BrandComponents";
+import { ExpandableCard } from "@/components/SubTabNav";
 import { Building2, Users, Landmark, Clock, AlertTriangle, MapPin } from "lucide-react";
 
 export default function CompanyTab() {
@@ -81,28 +82,38 @@ export default function CompanyTab() {
 
       <Divider />
 
-      {/* GP Roster */}
+      {/* GP Roster (interactive expandable cards) */}
       <SubTitle icon={<Users size={16} />}>GP Roster</SubTitle>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <p className="text-xs mb-4" style={{ color: "var(--muted-foreground)" }}>
+        Click any GP to expand their full profile and diligence lens.
+      </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
         {gpRoster.map((gp, i) => (
-          <Card key={i} title={gp.name} variant={gp.credentials.includes("MHCDS") ? "gold" : "default"}>
+          <ExpandableCard
+            key={i}
+            title={gp.name}
+            subtitle={gp.specialty}
+            badge={
+              <Badge variant={gp.credentials.includes("MHCDS") ? "gold" : "green"}>
+                {gp.role}
+              </Badge>
+            }
+          >
             <div className="space-y-2">
-              <div className="flex flex-wrap gap-1.5">
-                <Badge variant="green">{gp.role}</Badge>
-                <Badge variant="blue">{gp.specialty}</Badge>
-              </div>
               <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
                 {gp.credentials}
               </p>
-              <p>{gp.diligenceLens}</p>
+              <HighlightBlock variant="forest" label="DILIGENCE LENS">
+                <p>{gp.diligenceLens}</p>
+              </HighlightBlock>
             </div>
-          </Card>
+          </ExpandableCard>
         ))}
       </div>
 
       {/* Lifecycle Coverage */}
       <SubTitle>Clinical Lifecycle Coverage</SubTitle>
-      <p className="text-sm mb-4" style={{ color: "var(--muted-foreground)" }}>
+      <p className="text-xs mb-3" style={{ color: "var(--muted-foreground)" }}>
         Together, the GP roster covers the full arc of human medicine. No competing physician-led fund has this breadth.
       </p>
       <DataTable
@@ -114,7 +125,7 @@ export default function CompanyTab() {
 
       {/* Founding Story */}
       <SubTitle icon={<Clock size={16} />}>Why Now</SubTitle>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
         {foundingWhyNow.map((item, i) => (
           <Card key={i} title={item.title} variant="forest">
             <p>{item.detail}</p>
