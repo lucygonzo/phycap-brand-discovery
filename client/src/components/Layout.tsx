@@ -65,7 +65,7 @@ const navSections: NavSection[] = [
       { id: "actions", label: "Actions", icon: <CheckSquare size={16} /> },
       { id: "decisions", label: "Decisions", icon: <BookOpen size={16} /> },
       { id: "reportcard", label: "Report Card", icon: <ClipboardCheck size={16} /> },
-      { id: "gpcontent", label: "GP Content", icon: <Mic2 size={16} /> },
+      { id: "gpcontent", label: "Content Network", icon: <Mic2 size={16} /> },
     ],
   },
 ];

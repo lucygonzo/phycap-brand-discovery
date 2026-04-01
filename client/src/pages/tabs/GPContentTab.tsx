@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import {
   gpContentMeta,
   gpContentStats,
@@ -6,149 +7,140 @@ import {
   companyPageRoles,
   linkedInBannerSpecs,
   photoTreatment,
+  contentCalendar,
 } from "@/lib/gpContentData";
 import {
   SectionHeader,
   KeyTakeaway,
   Card,
   StatCard,
-  Divider,
-  SubTitle,
+  Badge,
   DataTable,
   HighlightBlock,
   InfoRow,
-  Badge,
+  SubTitle,
+  Divider,
 } from "@/components/BrandComponents";
 import SubTabNav from "@/components/SubTabNav";
-import { Users, Layers, Megaphone, Image, User, MessageSquare, Calendar } from "lucide-react";
+import { Network, Building2, Calendar, Image, ArrowRight, Layers } from "lucide-react";
 
 const gold = "var(--phycap-gold)";
+const forest = "var(--phycap-forest)";
+const border = "var(--border)";
 
-function GPProfileCard({ gp }: { gp: typeof gpProfiles[0] }) {
-  return (
-    <div
-      className="rounded-lg overflow-hidden mb-6"
-      style={{ background: "var(--card)", border: "1px solid var(--border)" }}
-    >
-      {/* Profile Header */}
-      <div
-        className="p-5"
-        style={{
-          background: "var(--phycap-forest)",
-          borderBottom: `2px solid ${gold}`,
-        }}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-          <div>
-            <h3 className="font-medium text-base" style={{ color: "var(--phycap-cream)" }}>
-              {gp.name}
-            </h3>
-            <p className="text-xs mt-1" style={{ color: gold }}>{gp.title}</p>
-            <p className="text-xs mt-0.5" style={{ color: "oklch(0.65 0.01 60)" }}>
-              {gp.specialty} | {gp.base}
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-1.5">
-            <Badge variant="gold">{gp.cadence}</Badge>
-            <span className="text-[10px]" style={{ color: "oklch(0.55 0.03 60)" }}>
-              Banner: {gp.bannerConcept}
-            </span>
-          </div>
-        </div>
-        <p className="text-xs mt-2 italic" style={{ color: "oklch(0.72 0.03 60)" }}>
-          "{gp.bannerTagline}"
-        </p>
-      </div>
-
-      <div className="p-5 space-y-4">
-        {/* Credentials and Support */}
-        <div>
-          <InfoRow label="Credentials" value={gp.credentials} />
-          <InfoRow label="Support Model" value={gp.supportModel} />
-          <InfoRow label="Best Format" value={gp.bestFormat} />
-        </div>
-
-        {/* Voice Traits */}
-        <div>
-          <p className="text-xs font-medium mb-2" style={{ color: "var(--muted-foreground)" }}>VOICE TRAITS</p>
-          <div className="flex flex-wrap gap-1.5">
-            {gp.voiceTraits.map((trait, i) => (
-              <Badge key={i} variant="green">{trait}</Badge>
-            ))}
-          </div>
-        </div>
-
-        {/* Voice Guardrails */}
-        <div>
-          <p className="text-xs font-medium mb-2" style={{ color: "var(--muted-foreground)" }}>GUARDRAILS</p>
-          <div className="flex flex-wrap gap-1.5">
-            {gp.voiceGuardrails.map((g, i) => (
-              <Badge key={i} variant="red">{g}</Badge>
-            ))}
-          </div>
-        </div>
-
-        {/* Owned Territories */}
-        <div>
-          <p className="text-xs font-medium mb-2" style={{ color: "var(--muted-foreground)" }}>OWNED CONTENT TERRITORIES</p>
-          <ul className="space-y-1">
-            {gp.ownedTerritories.map((t, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm">
-                <span style={{ color: gold, marginTop: "2px" }}>&#8226;</span>
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Shared Territories */}
-        <div>
-          <p className="text-xs font-medium mb-2" style={{ color: "var(--muted-foreground)" }}>SHARED TERRITORIES</p>
-          <div className="flex flex-wrap gap-1.5">
-            {gp.sharedTerritories.map((t, i) => (
-              <Badge key={i} variant="muted">{t}</Badge>
-            ))}
-          </div>
-        </div>
-
-        {/* Never Post */}
-        <HighlightBlock variant="amber" label="NEVER POST">
-          <p>{gp.neverPost}</p>
-        </HighlightBlock>
-
-        {/* Topic Ideas */}
-        <div>
-          <p className="text-xs font-medium mb-2" style={{ color: "var(--muted-foreground)" }}>TOPIC IDEAS (NEXT 30 DAYS)</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-            {gp.topicIdeas.map((topic, i) => (
-              <div
-                key={i}
-                className="text-xs px-2.5 py-1.5 rounded"
-                style={{ background: "var(--muted)", color: "var(--foreground)" }}
-              >
-                {i + 1}. {topic}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+/* ============================================================
+   GP COLOR HELPERS
+   ============================================================ */
+function gpTextColor(gpColor: string): string {
+  // Tim's cream background needs forest text; everyone else uses light text
+  return gpColor === "#F5F2F0" ? "#122620" : "#F5F2F0";
 }
 
-/* ---- Sub-tab content sections ---- */
-
-function OverviewContent() {
+/* ============================================================
+   NETWORK MAP SUB-TAB
+   ============================================================ */
+function NetworkMapContent() {
   return (
     <>
+      <KeyTakeaway
+        label="HOUSE OF BRANDS MODEL"
+        text="PhyCap operates a coordinated content network, not a single company voice. The company page anchors the thesis. Four GP personal brands refract that thesis through distinct clinical lenses, reaching audiences the company page alone would never touch. Each GP owns specific content territories while sharing others, creating a web of credibility that compounds with every post."
+      />
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {gpContentStats.map((stat, i) => (
           <StatCard key={i} value={stat.value} label={stat.label} note={stat.note} accent={i === 0} />
         ))}
       </div>
 
-      <KeyTakeaway label="KEY TAKEAWAY" text={gpContentMeta.keyTakeaway} />
+      {/* Hub-Spoke Visualization */}
+      <SubTitle icon={<Network size={16} />}>Content Network Architecture</SubTitle>
 
+      <div className="relative mb-10">
+        {/* Hub-Spoke Grid Layout */}
+        <div className="grid grid-cols-3 gap-4 max-w-3xl mx-auto" style={{ gridTemplateRows: "auto auto auto" }}>
+
+          {/* Top row: Paul (left) and Vipul (right) */}
+          <div className="col-start-1 row-start-1">
+            <GPSpokeCard gp={gpProfiles[0]} />
+          </div>
+          <div className="col-start-2 row-start-1 flex items-end justify-center pb-2">
+            <ConnectorLine direction="vertical" />
+          </div>
+          <div className="col-start-3 row-start-1">
+            <GPSpokeCard gp={gpProfiles[1]} />
+          </div>
+
+          {/* Middle row: Connector | Hub | Connector */}
+          <div className="col-start-1 row-start-2 flex items-center justify-end pr-2">
+            <ConnectorLine direction="horizontal" />
+          </div>
+          <div className="col-start-2 row-start-2">
+            <div
+              className="rounded-xl p-5 text-center"
+              style={{
+                background: forest,
+                border: `2px solid ${gold}`,
+                boxShadow: "0 4px 24px oklch(0 0 0 / 0.15)",
+              }}
+            >
+              <div className="display-font text-lg mb-1" style={{ color: gold }}>
+                PhyCap
+              </div>
+              <div className="text-xs font-medium mb-2" style={{ color: "oklch(0.85 0.01 60)" }}>
+                Investment Thesis
+              </div>
+              <div className="text-[10px] leading-relaxed" style={{ color: "oklch(0.65 0.01 60)" }}>
+                Physician-led healthcare venture investing at the point of care
+              </div>
+            </div>
+          </div>
+          <div className="col-start-3 row-start-2 flex items-center justify-start pl-2">
+            <ConnectorLine direction="horizontal" />
+          </div>
+
+          {/* Bottom row: Robin (left) and Tim (right) */}
+          <div className="col-start-1 row-start-3">
+            <GPSpokeCard gp={gpProfiles[2]} />
+          </div>
+          <div className="col-start-2 row-start-3 flex items-start justify-center pt-2">
+            <ConnectorLine direction="vertical" />
+          </div>
+          <div className="col-start-3 row-start-3">
+            <GPSpokeCard gp={gpProfiles[3]} />
+          </div>
+        </div>
+      </div>
+
+      {/* Content Flow */}
+      <SubTitle icon={<Layers size={16} />}>Content Flow</SubTitle>
+      <div className="flex flex-wrap items-center gap-2 mb-8">
+        {[
+          "Thesis",
+          "Monthly Plan",
+          "GP Briefs",
+          "Individual Posts",
+          "Cross-amplification",
+        ].map((step, i, arr) => (
+          <div key={i} className="flex items-center gap-2">
+            <div
+              className="px-4 py-2.5 rounded-lg text-sm font-medium"
+              style={{
+                background: i === 0 ? forest : "var(--card)",
+                color: i === 0 ? gold : "var(--foreground)",
+                border: i === 0 ? "none" : `1px solid ${border}`,
+              }}
+            >
+              {step}
+            </div>
+            {i < arr.length - 1 && (
+              <ArrowRight size={14} style={{ color: gold, flexShrink: 0 }} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* System Layers */}
       <SubTitle icon={<Layers size={16} />}>Content System Architecture</SubTitle>
       <div className="space-y-3 mb-6">
         {contentSystemLayers.map((layer, i) => (
@@ -158,68 +150,206 @@ function OverviewContent() {
           </HighlightBlock>
         ))}
       </div>
-
-      <SubTitle icon={<MessageSquare size={16} />}>Content Quality Standards</SubTitle>
-      <Card title="Every PhyCap-Attributed Post Must Meet These Standards" variant="forest">
-        <ul className="space-y-2">
-          {[
-            "Rooted in clinical experience or evidence (not abstract opinion)",
-            "Connected to the investment thesis (even loosely)",
-            "Free of em dashes",
-            "Free of generic healthcare-AI hype without PhyCap-specific clinical insight",
-            "Written in the GP's authentic voice (not homogenized across all four)",
-            "Includes a perspective that only a practicing physician could credibly offer",
-          ].map((std, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm">
-              <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
-              <span>{std}</span>
-            </li>
-          ))}
-        </ul>
-      </Card>
     </>
   );
 }
 
-function CalendarContent() {
+/* ---- Spoke Card for GP in hub visualization ---- */
+function GPSpokeCard({ gp }: { gp: typeof gpProfiles[0] }) {
+  const textColor = gpTextColor(gp.gpColor);
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "") || "";
+
+  return (
+    <div
+      className="rounded-lg overflow-hidden transition-all hover:shadow-lg"
+      style={{ border: `1px solid ${border}` }}
+    >
+      {/* Color accent bar */}
+      <div className="h-1.5" style={{ background: gp.gpColor }} />
+
+      <div className="p-4" style={{ background: "var(--card)" }}>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h4 className="font-medium text-sm" style={{ color: "var(--foreground)" }}>
+              {gp.name.split(",")[0]}
+            </h4>
+            <p className="text-[11px] mt-0.5" style={{ color: "var(--muted-foreground)" }}>
+              {gp.specialty}
+            </p>
+          </div>
+        </div>
+
+        <p className="text-xs italic mb-3 leading-relaxed" style={{ color: "var(--foreground)" }}>
+          "{gp.oneThingOnly}"
+        </p>
+
+        <div className="flex items-center justify-between">
+          <Badge variant="gold">{gp.cadence}</Badge>
+          <Link
+            href={`${base}/gp/${gp.slug}`}
+            className="inline-flex items-center gap-1 text-[11px] font-medium transition-colors"
+            style={{ color: gold }}
+          >
+            View Homebase
+            <ArrowRight size={11} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---- Connector lines for hub-spoke ---- */
+function ConnectorLine({ direction }: { direction: "horizontal" | "vertical" }) {
+  if (direction === "horizontal") {
+    return (
+      <div className="flex items-center gap-1">
+        <div className="w-6 h-px" style={{ background: gold, opacity: 0.4 }} />
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: gold, opacity: 0.6 }} />
+        <div className="w-6 h-px" style={{ background: gold, opacity: 0.4 }} />
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div className="w-px h-6" style={{ background: gold, opacity: 0.4 }} />
+      <div className="w-1.5 h-1.5 rounded-full" style={{ background: gold, opacity: 0.6 }} />
+      <div className="w-px h-6" style={{ background: gold, opacity: 0.4 }} />
+    </div>
+  );
+}
+
+/* ============================================================
+   COMPANY PAGE SUB-TAB
+   ============================================================ */
+function CompanyPageContent() {
   return (
     <>
-      <SubTitle icon={<Megaphone size={16} />}>Company Page vs. GP Profile Roles</SubTitle>
+      <KeyTakeaway
+        label="COMPANY PAGE STRATEGY"
+        text="The PhyCap company page serves as the institutional voice of the fund. It publishes official announcements, amplifies GP content with thesis-level framing, and maintains the brand's credibility baseline. The company page never competes with GP voices for attention; it elevates them."
+      />
+
+      <SubTitle>Company Page vs. GP Profile Roles</SubTitle>
       <DataTable
         headers={["Content Type", "Company Page", "GP Profiles"]}
         rows={companyPageRoles.map((r) => [r.contentType, r.companyPage, r.gpRole])}
       />
 
       <div className="mt-8">
-        <SubTitle icon={<Layers size={16} />}>Cross-Posting Protocol</SubTitle>
-        <div className="space-y-3">
-          <HighlightBlock variant="forest" label="COMPANY PAGE ENGAGEMENT">
-            <p>Within 2 hours of a GP post going live, the company page engages (like, comment, or repost with commentary).</p>
-          </HighlightBlock>
-          <HighlightBlock variant="gold" label="GP AMPLIFICATION">
-            <p>GPs amplify company page content on a staggered 4 to 8 hour schedule to avoid clustering.</p>
-          </HighlightBlock>
-          <HighlightBlock variant="forest" label="CROSS-GP COMMENTARY">
-            <p>GPs comment on each other's posts with substantive clinical perspective, not generic praise.</p>
-          </HighlightBlock>
+        <SubTitle>When the Company Page Posts Independently</SubTitle>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card title="Independent Publishing" variant="forest">
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-start gap-2">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>Fund announcements and milestones</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>Portfolio company news (official)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>Quarterly thesis framework updates</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>Event promotions and community announcements</span>
+              </li>
+            </ul>
+          </Card>
+          <Card title="Amplification Mode" variant="gold">
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-start gap-2">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>GP thesis posts (reposted with framing sentence)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>GP clinical insight posts (engage with comment)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>GP event recaps (repost with community frame)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>GP policy analysis (repost for broad audience reach)</span>
+              </li>
+            </ul>
+          </Card>
         </div>
       </div>
 
       <div className="mt-8">
-        <SubTitle>Monthly Planning Cadence</SubTitle>
-        <Card variant="default">
-          <div className="space-y-2 text-sm">
-            <p><strong>Week 1:</strong> Planning doc published with 4 to 5 topic clusters, thesis connections, and GP assignments.</p>
-            <p><strong>Week 2-3:</strong> GP-adapted briefs distributed. Paul gets scaffolding, Vipul gets idea prompts, Robin gets near-final drafts, Tim gets light briefs.</p>
-            <p><strong>Week 4:</strong> Monthly review of per-GP engagement, inbound inquiries, topic performance, and network growth.</p>
-          </div>
+        <SubTitle>Investment Announcement Sequencing</SubTitle>
+        <div className="space-y-3">
+          {[
+            { step: "1", label: "COMPANY PAGE", detail: "Publishes the official investment announcement. Professional tone, key terms, fund thesis connection." },
+            { step: "2", label: "LEAD GP (PAUL)", detail: "Adds personal commentary within 4 hours. Connects the investment to the thesis narrative he has been building." },
+            { step: "3", label: "RELEVANT GP", detail: "The GP whose clinical specialty aligns with the investment adds their clinical perspective within 8 hours." },
+            { step: "4", label: "REMAINING GPS", detail: "Other GPs amplify over 24 hours with brief, authentic engagement (comments, reposts with personal note)." },
+          ].map((item) => (
+            <HighlightBlock key={item.step} variant={item.step === "1" ? "forest" : "gold"} label={`STEP ${item.step}`}>
+              <p className="font-medium mb-1">{item.label}</p>
+              <p>{item.detail}</p>
+            </HighlightBlock>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ============================================================
+   CONTENT CALENDAR SUB-TAB
+   ============================================================ */
+function ContentCalendarContent() {
+  return (
+    <>
+      <SubTitle icon={<Calendar size={16} />}>Monthly Calendar Structure</SubTitle>
+      <div className="space-y-3 mb-8">
+        {contentCalendar.monthlyStructure.map((week, i) => (
+          <Card key={i} title={week.week} variant={i === 0 ? "forest" : "default"}>
+            <p className="font-medium text-sm mb-1" style={{ color: gold }}>{week.focus}</p>
+            <p className="text-sm">{week.detail}</p>
+          </Card>
+        ))}
+      </div>
+
+      <SubTitle>Topic Cluster Ownership</SubTitle>
+      <DataTable
+        headers={["Topic Cluster", "Primary Owner", "Supporting GPs", "Cadence"]}
+        rows={contentCalendar.topicOwnership.map((t) => [
+          t.cluster,
+          t.primary,
+          t.supporting.length > 0 ? t.supporting.join(", ") : "Solo",
+          t.cadence,
+        ])}
+      />
+
+      <div className="mt-8">
+        <SubTitle>Cross-Posting Rules</SubTitle>
+        <Card title="Engagement Protocol" variant="forest">
+          <ul className="space-y-2">
+            {contentCalendar.crossPostingRules.map((rule, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm">
+                <span style={{ color: gold, marginTop: "2px" }}>&#10003;</span>
+                <span>{rule}</span>
+              </li>
+            ))}
+          </ul>
         </Card>
       </div>
     </>
   );
 }
 
-function LinkedInContent() {
+/* ============================================================
+   LINKEDIN SPECS SUB-TAB
+   ============================================================ */
+function LinkedInSpecsContent() {
   return (
     <>
       <SubTitle icon={<Image size={16} />}>Banner Specifications</SubTitle>
@@ -239,22 +369,56 @@ function LinkedInContent() {
       </div>
 
       <div className="mt-6">
-        <SubTitle>Bio Template Structure</SubTitle>
-        <HighlightBlock variant="forest" label="BIO FORMAT">
-          <div className="space-y-2 text-sm">
-            <p><strong>Line 1:</strong> Clinical title and specialty</p>
-            <p><strong>Line 2:</strong> GP role at PhyCap</p>
-            <p><strong>Line 3:</strong> Key credential (MHCDS, MBA, PhD)</p>
-            <p><strong>Line 4:</strong> Banner tagline in italics</p>
-          </div>
-        </HighlightBlock>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SubTitle>Per-GP Banner and Bio Details</SubTitle>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {gpProfiles.map((gp, i) => (
-            <Card key={i} title={gp.name} variant={i === 0 ? "forest" : "default"}>
-              <InfoRow label="Banner Concept" value={gp.bannerConcept} />
-              <InfoRow label="Tagline" value={gp.bannerTagline} />
-              <InfoRow label="Cadence" value={gp.cadence} />
-            </Card>
+            <div
+              key={i}
+              className="rounded-lg overflow-hidden"
+              style={{ border: `1px solid ${border}` }}
+            >
+              {/* Color header bar */}
+              <div
+                className="p-4"
+                style={{ background: gp.gpColor }}
+              >
+                <h4
+                  className="font-medium text-sm"
+                  style={{ color: gpTextColor(gp.gpColor) }}
+                >
+                  {gp.name.split(",")[0]}
+                </h4>
+                <p
+                  className="text-xs mt-0.5 italic"
+                  style={{ color: gpTextColor(gp.gpColor), opacity: 0.8 }}
+                >
+                  "{gp.bannerTagline}"
+                </p>
+              </div>
+              <div className="p-4 space-y-2" style={{ background: "var(--card)" }}>
+                <InfoRow label="Banner Concept" value={gp.bannerConcept} />
+                <InfoRow label="Cadence" value={gp.cadence} />
+                <InfoRow label="Photo Notes" value={gp.photoNotes} />
+                <div className="pt-2">
+                  <p className="text-[10px] font-medium uppercase mb-1.5" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                    BIO TEMPLATE
+                  </p>
+                  <div className="text-xs space-y-0.5">
+                    {gp.bioTemplate.map((line, li) => (
+                      <p key={li} style={{ color: "var(--foreground)" }}>{line}</p>
+                    ))}
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <p className="text-[10px] font-medium uppercase mb-1" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                    CTA LANGUAGE
+                  </p>
+                  <p className="text-xs italic" style={{ color: "var(--foreground)" }}>
+                    "{gp.ctaLanguage}"
+                  </p>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -262,15 +426,15 @@ function LinkedInContent() {
   );
 }
 
+/* ============================================================
+   MAIN EXPORT
+   ============================================================ */
 export default function GPContentTab() {
-  const gpTabs = [
-    { id: "overview", label: "Overview" },
-    { id: "paul", label: "Paul Slosar" },
-    { id: "vipul", label: "Vipul Kella" },
-    { id: "robin", label: "Robin Noble" },
-    { id: "tim", label: "Tim Martens" },
-    { id: "calendar", label: "Calendar" },
-    { id: "linkedin", label: "LinkedIn" },
+  const subTabs = [
+    { id: "network", label: "Network Map" },
+    { id: "company-page", label: "Company Page" },
+    { id: "calendar", label: "Content Calendar" },
+    { id: "linkedin", label: "LinkedIn Specs" },
   ];
 
   return (
@@ -281,22 +445,16 @@ export default function GPContentTab() {
         subtitle={gpContentMeta.subtitle}
       />
 
-      <SubTabNav tabs={gpTabs}>
+      <SubTabNav tabs={subTabs}>
         {(activeSubTab) =>
-          activeSubTab === "overview" ? (
-            <OverviewContent />
-          ) : activeSubTab === "paul" ? (
-            <GPProfileCard gp={gpProfiles[0]} />
-          ) : activeSubTab === "vipul" ? (
-            <GPProfileCard gp={gpProfiles[1]} />
-          ) : activeSubTab === "robin" ? (
-            <GPProfileCard gp={gpProfiles[2]} />
-          ) : activeSubTab === "tim" ? (
-            <GPProfileCard gp={gpProfiles[3]} />
+          activeSubTab === "network" ? (
+            <NetworkMapContent />
+          ) : activeSubTab === "company-page" ? (
+            <CompanyPageContent />
           ) : activeSubTab === "calendar" ? (
-            <CalendarContent />
+            <ContentCalendarContent />
           ) : activeSubTab === "linkedin" ? (
-            <LinkedInContent />
+            <LinkedInSpecsContent />
           ) : null
         }
       </SubTabNav>
