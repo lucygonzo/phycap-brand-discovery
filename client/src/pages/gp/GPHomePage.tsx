@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "wouter";
 import type { GPProfile } from "@/lib/gpContentData";
 import { gpProfiles, linkedInBannerSpecs, photoTreatment } from "@/lib/gpContentData";
+import { gpSubBrands, fundDisclaimer, voiceSignals } from "@/lib/gpSubBrandData";
+import type { GPSubBrand, SamplePost, ColorSpec } from "@/lib/gpSubBrandData";
 import {
   Badge,
   Card,
@@ -19,9 +21,13 @@ const border = "var(--border)";
 
 const GP_SECTIONS = [
   { id: "voice", label: "Voice" },
+  { id: "subbrand", label: "Sub-Brand" },
   { id: "territories", label: "Territories" },
   { id: "topics", label: "Topics" },
+  { id: "sampleposts", label: "Sample Posts" },
+  { id: "visualdirection", label: "Visual" },
   { id: "linkedin", label: "LinkedIn" },
+  { id: "compliance", label: "Compliance" },
   { id: "workspace", label: "Workspace" },
 ] as const;
 
@@ -40,7 +46,7 @@ function gpSubtleTextColor(gpColor: string): string {
   return gpColor === "#F5F2F0" ? "oklch(0.55 0.02 60)" : "oklch(0.60 0.01 60)";
 }
 
-const statusConfig: Record<string, { label: string; variant: "green" | "amber" | "blue" | "muted" | "gold" }> = {
+const statusConfig: Record<string, { label: string; variant: "green" | "amber" | "blue" | "muted" | "gold" | "red" }> = {
   idea: { label: "Idea", variant: "muted" },
   drafted: { label: "Drafted", variant: "amber" },
   scheduled: { label: "Scheduled", variant: "blue" },
@@ -48,6 +54,8 @@ const statusConfig: Record<string, { label: string; variant: "green" | "amber" |
   pipeline: { label: "Pipeline", variant: "muted" },
   draft: { label: "Draft", variant: "amber" },
   review: { label: "In Review", variant: "gold" },
+  approved: { label: "Approved", variant: "green" },
+  "needs-review": { label: "Needs Review", variant: "amber" },
 };
 
 /* ============================================================
@@ -69,6 +77,9 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
   const textColor = gpTextColor(gp.gpColor);
   const mutedColor = gpMutedTextColor(gp.gpColor);
   const subtleColor = gpSubtleTextColor(gp.gpColor);
+
+  // Sub-brand data for this GP
+  const subBrand = gpSubBrands[gp.slug];
 
   /* IntersectionObserver for active sidebar state */
   useEffect(() => {
@@ -175,7 +186,7 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
         </div>
 
         {/* Section navigation */}
-        <nav className="flex-1 px-4 pb-4">
+        <nav className="flex-1 px-4 pb-4 overflow-y-auto">
           <div
             className="eyebrow px-2 py-1.5 mb-2"
             style={{
@@ -279,7 +290,7 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
               </span>
             </div>
 
-            {/* One Thing Only - Pull Quote */}
+            {/* One Thing Only - Pull Quote (uses GP's secondary typeface) */}
             <div
               className="mt-8 pl-5"
               style={{
@@ -287,15 +298,16 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
               }}
             >
               <p
-                className="display-font italic"
+                className="italic"
                 style={{
+                  fontFamily: subBrand?.secondaryTypeface.family || "'Marcellus', serif",
                   fontSize: "clamp(18px, 2.5vw, 24px)",
                   color: textColor,
                   lineHeight: 1.4,
                   opacity: 0.9,
                 }}
               >
-                "{gp.oneThingOnly}"
+                &ldquo;{gp.oneThingOnly}&rdquo;
               </p>
             </div>
 
@@ -371,13 +383,259 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
 
           <Divider />
 
+          {/* ---------- SUB-BRAND IDENTITY ---------- */}
+          {subBrand && (
+            <>
+              <section
+                id="subbrand"
+                ref={setSectionRef("subbrand")}
+                className="scroll-mt-6 pt-4 pb-16"
+              >
+                <SectionHeading number="02" title="Sub-Brand Identity" />
+
+                {/* Color System */}
+                <p className="text-xs font-medium uppercase mb-3 mt-8" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  COLOR SYSTEM
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+                  <ColorSwatch
+                    spec={subBrand.colorSystem.primary}
+                    label="Primary"
+                  />
+                  <ColorSwatch
+                    spec={subBrand.colorSystem.secondaryAccent}
+                    label="Secondary Accent"
+                  />
+                  {subBrand.colorSystem.largeTextAccent && (
+                    <ColorSwatch
+                      spec={subBrand.colorSystem.largeTextAccent}
+                      label="Large-Text Accent"
+                    />
+                  )}
+                </div>
+
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  HERO TEXT OPTIONS
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {subBrand.colorSystem.heroTextOptions.map((opt, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs"
+                      style={{ background: "var(--card)", border: `1px solid ${border}` }}
+                    >
+                      <div
+                        className="w-4 h-4 rounded-full flex-shrink-0"
+                        style={{
+                          background: opt.hex,
+                          border: opt.hex === "#FFFFFF" || opt.hex === "#F5F2F0" ? `1px solid ${border}` : "none",
+                        }}
+                      />
+                      <span style={{ color: "var(--foreground)" }}>{opt.name}</span>
+                      <span className="font-mono text-[10px]" style={{ color: "var(--muted-foreground)" }}>{opt.hex}</span>
+                      {opt.wcagLevel && (
+                        <Badge variant={opt.wcagLevel === "AAA" ? "green" : "amber"}>{opt.wcagLevel}</Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {subBrand.colorSystem.neverUse.length > 0 && (
+                  <div className="mb-8">
+                    <HighlightBlock variant="red" label="NEVER USE">
+                      {subBrand.colorSystem.neverUse.map((item, i) => (
+                        <p key={i} className="text-sm">
+                          <strong>{item.description}.</strong> {item.reason}.
+                        </p>
+                      ))}
+                    </HighlightBlock>
+                  </div>
+                )}
+
+                {/* Secondary Typeface Specimen */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  SECONDARY TYPEFACE
+                </p>
+                <div
+                  className="rounded-lg p-6 mb-6"
+                  style={{ background: "var(--card)", border: `1px solid ${border}` }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                      {subBrand.secondaryTypeface.googleFontsName}
+                    </span>
+                    <Badge variant="muted">{subBrand.secondaryTypeface.description}</Badge>
+                  </div>
+                  <p className="text-xs mb-4" style={{ color: "var(--muted-foreground)" }}>
+                    {subBrand.secondaryTypeface.usage}
+                  </p>
+                  <div className="space-y-3">
+                    <p
+                      style={{
+                        fontFamily: subBrand.secondaryTypeface.family,
+                        fontSize: "32px",
+                        lineHeight: 1.2,
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      Headline Specimen
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: subBrand.secondaryTypeface.family,
+                        fontSize: "20px",
+                        lineHeight: 1.3,
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      Subhead specimen for section headers and callouts
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: subBrand.secondaryTypeface.family,
+                        fontSize: "14px",
+                        lineHeight: 1.6,
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      Body specimen at reading size. This typeface supports pull quotes, data callouts, and accent text within {gp.name.split(",")[0]}&rsquo;s content.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tone Spectrum */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  TONE SPECTRUM
+                </p>
+                <div
+                  className="rounded-lg p-5 mb-6"
+                  style={{ background: "var(--card)", border: `1px solid ${border}` }}
+                >
+                  <div className="space-y-4">
+                    {subBrand.toneSpectrum.map((dim, i) => (
+                      <ToneBar key={i} dimension={dim} gpColor={gp.gpColor} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Content Format Rankings */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  CONTENT FORMAT RANKINGS
+                </p>
+                <div className="space-y-2 mb-6">
+                  {subBrand.contentFormatRankings.map((item) => (
+                    <div
+                      key={item.rank}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg"
+                      style={{ background: "var(--card)", border: `1px solid ${border}` }}
+                    >
+                      <span
+                        className="text-lg font-bold flex-shrink-0 w-8 text-center"
+                        style={{ color: gold }}
+                      >
+                        {item.rank}
+                      </span>
+                      <span className="text-sm" style={{ color: "var(--foreground)" }}>
+                        {item.format}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Opening & Closing Patterns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <Card title="Opening Pattern" variant="forest">
+                    <p className="text-xs mb-2" style={{ color: "var(--muted-foreground)" }}>
+                      {subBrand.openingPattern.description}
+                    </p>
+                    <p
+                      className="text-sm italic"
+                      style={{
+                        fontFamily: subBrand.secondaryTypeface.family,
+                        color: "var(--foreground)",
+                        paddingLeft: "12px",
+                        borderLeft: `2px solid ${gold}`,
+                      }}
+                    >
+                      &ldquo;{subBrand.openingPattern.example}&rdquo;
+                    </p>
+                  </Card>
+                  <Card title="Closing Pattern" variant="gold">
+                    <p className="text-xs mb-2" style={{ color: "var(--muted-foreground)" }}>
+                      {subBrand.closingPattern.description}
+                    </p>
+                    <p
+                      className="text-sm italic"
+                      style={{
+                        fontFamily: subBrand.secondaryTypeface.family,
+                        color: "var(--foreground)",
+                        paddingLeft: "12px",
+                        borderLeft: `2px solid ${gold}`,
+                      }}
+                    >
+                      &ldquo;{subBrand.closingPattern.example}&rdquo;
+                    </p>
+                  </Card>
+                </div>
+
+                {/* Signature Phrases */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  SIGNATURE PHRASES
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-6">
+                  {subBrand.signaturePhrases.map((phrase, i) => (
+                    <Badge key={i} variant="gold">&ldquo;{phrase}&rdquo;</Badge>
+                  ))}
+                </div>
+
+                {/* Hashtag Strategy */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  HASHTAG STRATEGY
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <Card title="Shared PhyCap Tags" variant="default">
+                    <div className="flex flex-wrap gap-1.5">
+                      {subBrand.hashtags.shared.map((tag, i) => (
+                        <Badge key={i} variant="muted">{tag}</Badge>
+                      ))}
+                    </div>
+                  </Card>
+                  <Card title="Personal Tags" variant="default">
+                    <div className="flex flex-wrap gap-1.5">
+                      {subBrand.hashtags.personal.map((tag, i) => (
+                        <Badge key={i} variant="gold">{tag}</Badge>
+                      ))}
+                    </div>
+                  </Card>
+                </div>
+
+                {/* Engagement Rules */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  ENGAGEMENT RULES
+                </p>
+                <Card variant="default">
+                  <ul className="space-y-2">
+                    {subBrand.engagementRules.map((rule, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm">
+                        <span style={{ color: gold, marginTop: "2px" }}>&#8226;</span>
+                        <span>{rule.rule}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              </section>
+
+              <Divider />
+            </>
+          )}
+
           {/* ---------- CONTENT TERRITORIES ---------- */}
           <section
             id="territories"
             ref={setSectionRef("territories")}
             className="scroll-mt-6 pt-4 pb-16"
           >
-            <SectionHeading number="02" title="Content Territories" />
+            <SectionHeading number="03" title="Content Territories" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 mb-6">
               <Card title="Owned Territories" variant="forest">
@@ -449,7 +707,7 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
             ref={setSectionRef("topics")}
             className="scroll-mt-6 pt-4 pb-16"
           >
-            <SectionHeading number="03" title="30-Day Topic Queue" />
+            <SectionHeading number="04" title="30-Day Topic Queue" />
 
             <div className="flex flex-wrap gap-2 mb-6 mt-8">
               {["All", "idea", "drafted", "scheduled", "published"].map((filter) => (
@@ -497,15 +755,230 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
 
           <Divider />
 
+          {/* ---------- SAMPLE POSTS ---------- */}
+          {subBrand && (
+            <>
+              <section
+                id="sampleposts"
+                ref={setSectionRef("sampleposts")}
+                className="scroll-mt-6 pt-4 pb-16"
+              >
+                <SectionHeading number="05" title="Sample Posts" />
+
+                <div className="space-y-6 mt-8">
+                  {subBrand.samplePosts.map((post) => (
+                    <SamplePostCard
+                      key={post.id}
+                      post={post}
+                      gpName={gp.name}
+                      gpTitle={gp.title}
+                      gpColor={gp.gpColor}
+                      typeface={subBrand.secondaryTypeface.family}
+                    />
+                  ))}
+                </div>
+              </section>
+
+              <Divider />
+            </>
+          )}
+
+          {/* ---------- VISUAL DIRECTION ---------- */}
+          {subBrand && (
+            <>
+              <section
+                id="visualdirection"
+                ref={setSectionRef("visualdirection")}
+                className="scroll-mt-6 pt-4 pb-16"
+              >
+                <SectionHeading number="06" title="Visual Direction" />
+
+                {/* Image Style Description */}
+                <p className="text-xs font-medium uppercase mb-3 mt-8" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  IMAGE STYLE
+                </p>
+                <Card variant="default">
+                  <p className="text-sm leading-relaxed">{subBrand.visualDirection.description}</p>
+                </Card>
+
+                {/* Color Palette Strip */}
+                <p className="text-xs font-medium uppercase mb-3 mt-6" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  GP COLOR PALETTE
+                </p>
+                <div className="flex rounded-lg overflow-hidden mb-6" style={{ height: "48px", border: `1px solid ${border}` }}>
+                  <div className="flex-1 relative" style={{ background: subBrand.colorSystem.primary.hex }}>
+                    <span
+                      className="absolute bottom-1 left-2 text-[9px] font-mono"
+                      style={{
+                        color: subBrand.colorSystem.primary.hex === "#F5F2F0" || subBrand.colorSystem.primary.hex === "#D3B184"
+                          ? "#122620"
+                          : "#F5F2F0",
+                      }}
+                    >
+                      {subBrand.colorSystem.primary.hex}
+                    </span>
+                  </div>
+                  <div className="flex-1 relative" style={{ background: subBrand.colorSystem.secondaryAccent.hex }}>
+                    <span
+                      className="absolute bottom-1 left-2 text-[9px] font-mono"
+                      style={{
+                        color: subBrand.colorSystem.secondaryAccent.hex === "#D3B184" ? "#122620" : "#F5F2F0",
+                      }}
+                    >
+                      {subBrand.colorSystem.secondaryAccent.hex}
+                    </span>
+                  </div>
+                  {subBrand.colorSystem.largeTextAccent && (
+                    <div className="flex-1 relative" style={{ background: subBrand.colorSystem.largeTextAccent.hex }}>
+                      <span className="absolute bottom-1 left-2 text-[9px] font-mono" style={{ color: "#122620" }}>
+                        {subBrand.colorSystem.largeTextAccent.hex}
+                      </span>
+                    </div>
+                  )}
+                  {subBrand.colorSystem.heroTextOptions.map((opt, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 relative"
+                      style={{
+                        background: opt.hex,
+                        borderLeft: opt.hex === "#FFFFFF" || opt.hex === "#F5F2F0" ? `1px solid ${border}` : "none",
+                      }}
+                    >
+                      <span
+                        className="absolute bottom-1 left-2 text-[9px] font-mono"
+                        style={{ color: opt.hex === "#FFFFFF" || opt.hex === "#F5F2F0" || opt.hex === "#D3B184" ? "#122620" : "#F5F2F0" }}
+                      >
+                        {opt.hex}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* AI Prompt Modifier */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  AI GRAPHICS PROMPT MODIFIER
+                </p>
+                <div
+                  className="rounded-lg p-5 mb-6"
+                  style={{
+                    background: "oklch(0.15 0.01 200)",
+                    border: `1px solid oklch(0.30 0.01 200)`,
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-mono uppercase" style={{ color: "oklch(0.55 0.01 200)", letterSpacing: "0.08em" }}>
+                      Copy-paste ready
+                    </span>
+                    <CopyButton text={subBrand.visualDirection.aiPromptModifier} />
+                  </div>
+                  <p
+                    className="text-sm font-mono leading-relaxed"
+                    style={{ color: "oklch(0.80 0.01 200)" }}
+                  >
+                    {subBrand.visualDirection.aiPromptModifier}
+                  </p>
+                </div>
+
+                {/* Do / Don't Visual Examples */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  VISUAL DO / DON&rsquo;T
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div
+                    className="rounded-lg p-5"
+                    style={{
+                      background: "oklch(0.55 0.18 145 / 0.06)",
+                      border: "1px solid oklch(0.55 0.18 145 / 0.15)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: "oklch(0.55 0.18 145)" }}>
+                        &#10003;
+                      </div>
+                      <span className="text-xs font-semibold uppercase" style={{ letterSpacing: "0.1em", color: "oklch(0.45 0.15 145)" }}>
+                        Visual Do
+                      </span>
+                    </div>
+                    <ul className="space-y-2 text-sm" style={{ color: "var(--foreground)" }}>
+                      <li className="flex items-start gap-2">
+                        <span style={{ color: "oklch(0.55 0.18 145)", marginTop: "2px" }}>&#8226;</span>
+                        Use {subBrand.colorSystem.primary.name} ({subBrand.colorSystem.primary.hex}) as the dominant tone
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span style={{ color: "oklch(0.55 0.18 145)", marginTop: "2px" }}>&#8226;</span>
+                        Render pull quotes in {subBrand.secondaryTypeface.googleFontsName}
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span style={{ color: "oklch(0.55 0.18 145)", marginTop: "2px" }}>&#8226;</span>
+                        Maintain high contrast with {subBrand.colorSystem.secondaryAccent.name} accents
+                      </li>
+                    </ul>
+                  </div>
+                  <div
+                    className="rounded-lg p-5"
+                    style={{
+                      background: "oklch(0.55 0.20 25 / 0.06)",
+                      border: "1px solid oklch(0.55 0.20 25 / 0.15)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: "oklch(0.55 0.20 25)" }}>
+                        &#10007;
+                      </div>
+                      <span className="text-xs font-semibold uppercase" style={{ letterSpacing: "0.1em", color: "oklch(0.45 0.18 25)" }}>
+                        Visual Don&rsquo;t
+                      </span>
+                    </div>
+                    <ul className="space-y-2 text-sm" style={{ color: "var(--foreground)" }}>
+                      {subBrand.colorSystem.neverUse.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span style={{ color: "oklch(0.55 0.20 25)", marginTop: "2px" }}>&#8226;</span>
+                          {item.description} ({item.reason})
+                        </li>
+                      ))}
+                      <li className="flex items-start gap-2">
+                        <span style={{ color: "oklch(0.55 0.20 25)", marginTop: "2px" }}>&#8226;</span>
+                        Mix typefaces from other GP sub-brands
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span style={{ color: "oklch(0.55 0.20 25)", marginTop: "2px" }}>&#8226;</span>
+                        Use stock photography that contradicts the visual direction
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              <Divider />
+            </>
+          )}
+
           {/* ---------- LINKEDIN SPECS ---------- */}
           <section
             id="linkedin"
             ref={setSectionRef("linkedin")}
             className="scroll-mt-6 pt-4 pb-16"
           >
-            <SectionHeading number="04" title="LinkedIn Specs" />
+            <SectionHeading number="07" title="LinkedIn Specs" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+            {/* LinkedIn Headline */}
+            {subBrand && (
+              <div className="mt-8 mb-6">
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  LINKEDIN HEADLINE
+                </p>
+                <div
+                  className="rounded-lg p-4"
+                  style={{ background: "var(--card)", border: `1px solid ${border}`, borderLeft: `3px solid ${gold}` }}
+                >
+                  <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                    {subBrand.linkedInHeadline}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card title="Banner Design Direction" variant="default">
                 <InfoRow label="Concept" value={gp.bannerConcept} />
                 <InfoRow label="Tagline" value={gp.bannerTagline} />
@@ -534,7 +1007,7 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
                     CTA LANGUAGE
                   </p>
                   <p className="text-sm italic" style={{ color: "var(--foreground)" }}>
-                    "{gp.ctaLanguage}"
+                    &ldquo;{gp.ctaLanguage}&rdquo;
                   </p>
                 </div>
               </Card>
@@ -549,13 +1022,113 @@ function GPPageLayout({ gp }: { gp: GPProfile }) {
 
           <Divider />
 
+          {/* ---------- COMPLIANCE ---------- */}
+          {subBrand && (
+            <>
+              <section
+                id="compliance"
+                ref={setSectionRef("compliance")}
+                className="scroll-mt-6 pt-4 pb-16"
+              >
+                <SectionHeading number="08" title="Compliance & Approval" />
+
+                {/* Fund Disclaimer */}
+                <p className="text-xs font-medium uppercase mb-3 mt-8" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  FUND DISCLAIMER
+                </p>
+                <div
+                  className="rounded-lg p-4 mb-6"
+                  style={{
+                    background: "var(--card)",
+                    border: `1px solid ${border}`,
+                    borderLeft: "3px solid oklch(0.55 0.20 25)",
+                  }}
+                >
+                  <p className="text-sm italic leading-relaxed" style={{ color: "var(--foreground)" }}>
+                    {fundDisclaimer}
+                  </p>
+                  <p className="text-[10px] mt-2" style={{ color: "var(--muted-foreground)" }}>
+                    Required on all investment-related posts, shared across all GPs.
+                  </p>
+                </div>
+
+                {/* Approval Workflow */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  APPROVAL WORKFLOW
+                </p>
+                <div className="space-y-2 mb-6">
+                  {subBrand.complianceApprovals.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg"
+                      style={{ background: "var(--card)", border: `1px solid ${border}` }}
+                    >
+                      <div
+                        className="w-3 h-3 rounded-full flex-shrink-0"
+                        style={{
+                          background: item.color === "green"
+                            ? "oklch(0.55 0.18 145)"
+                            : item.color === "amber"
+                            ? "oklch(0.75 0.15 70)"
+                            : "oklch(0.55 0.20 25)",
+                        }}
+                      />
+                      <span className="text-sm flex-1" style={{ color: "var(--foreground)" }}>
+                        {item.contentType}
+                      </span>
+                      <Badge
+                        variant={item.color === "green" ? "green" : item.color === "amber" ? "amber" : "red"}
+                      >
+                        {item.approvalLevel === "none"
+                          ? "No review required"
+                          : item.approvalLevel === "kate-review"
+                          ? "Kate review"
+                          : item.approvalLevel === "kate-plus-legal"
+                          ? "Kate + Legal"
+                          : "Kate + Paul final"}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Personal vs. Fund Voice */}
+                <p className="text-xs font-medium uppercase mb-3" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
+                  PERSONAL VS. FUND VOICE
+                </p>
+                <Card variant="default">
+                  <div className="space-y-3">
+                    {voiceSignals.map((signal, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <span
+                          className="text-sm font-mono px-2 py-0.5 rounded flex-shrink-0"
+                          style={{
+                            background: "oklch(0.15 0.01 200)",
+                            color: "oklch(0.80 0.01 200)",
+                            fontSize: "12px",
+                          }}
+                        >
+                          {signal.phrase}
+                        </span>
+                        <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+                          {signal.meaning}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </section>
+
+              <Divider />
+            </>
+          )}
+
           {/* ---------- WORKSPACE ---------- */}
           <section
             id="workspace"
             ref={setSectionRef("workspace")}
             className="scroll-mt-6 pt-4 pb-16"
           >
-            <SectionHeading number="05" title="Workspace" />
+            <SectionHeading number="09" title="Workspace" />
 
             <p className="text-xs font-medium uppercase mb-3 mt-8" style={{ color: "var(--muted-foreground)", letterSpacing: "0.08em" }}>
               CONTENT PIPELINE
@@ -705,7 +1278,7 @@ function DoDontColumn({ type, items }: { type: "do" | "dont"; items: string[] })
               borderLeft: `2px solid ${isDo ? "oklch(0.55 0.18 145 / 0.3)" : "oklch(0.55 0.20 25 / 0.3)"}`,
             }}
           >
-            "{item}"
+            &ldquo;{item}&rdquo;
           </li>
         ))}
       </ul>
@@ -713,5 +1286,235 @@ function DoDontColumn({ type, items }: { type: "do" | "dont"; items: string[] })
   );
 }
 
-// Re-export for use in individual GP pages
-const otherGPs = gpProfiles;
+/* ---------- COLOR SWATCH ---------- */
+
+function ColorSwatch({ spec, label }: { spec: ColorSpec; label: string }) {
+  const isLight = spec.hex === "#F5F2F0" || spec.hex === "#D3B184" || spec.hex === "#FFFFFF";
+  return (
+    <div
+      className="rounded-lg overflow-hidden"
+      style={{ border: `1px solid ${border}` }}
+    >
+      <div
+        className="px-4 py-6 flex items-end justify-between"
+        style={{ background: spec.hex, minHeight: "80px" }}
+      >
+        <span
+          className="font-mono text-xs font-medium"
+          style={{ color: isLight ? "#122620" : "#F5F2F0" }}
+        >
+          {spec.hex}
+        </span>
+        {spec.wcagLevel && (
+          <span
+            className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+            style={{
+              background: isLight ? "oklch(0 0 0 / 0.08)" : "oklch(1 0 0 / 0.15)",
+              color: isLight ? "#122620" : "#F5F2F0",
+            }}
+          >
+            {spec.wcagLevel}
+          </span>
+        )}
+      </div>
+      <div className="px-4 py-3" style={{ background: "var(--card)" }}>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs font-semibold" style={{ color: "var(--foreground)" }}>
+            {spec.name}
+          </span>
+          <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
+            {label}
+          </span>
+        </div>
+        <p className="text-[11px] leading-snug" style={{ color: "var(--muted-foreground)" }}>
+          {spec.usage}
+        </p>
+        {spec.contrastRatio && (
+          <p className="text-[10px] font-mono mt-1" style={{ color: "var(--muted-foreground)" }}>
+            {spec.contrastRatio}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- TONE BAR ---------- */
+
+function ToneBar({ dimension, gpColor }: { dimension: { leftLabel: string; rightLabel: string; leftScore: number; rightScore: number }; gpColor: string }) {
+  // leftScore is 1-10, position the dot accordingly
+  const position = ((dimension.leftScore - 1) / 9) * 100;
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-xs font-medium" style={{ color: "var(--foreground)" }}>
+          {dimension.leftLabel}
+        </span>
+        <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+          {dimension.rightLabel}
+        </span>
+      </div>
+      <div className="relative h-2 rounded-full" style={{ background: "var(--muted)" }}>
+        <div
+          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2"
+          style={{
+            left: `${position}%`,
+            transform: `translate(-50%, -50%)`,
+            background: gpColor === "#F5F2F0" ? "#122620" : gpColor,
+            borderColor: gpColor === "#F5F2F0" ? "var(--border)" : "oklch(1 0 0 / 0.3)",
+          }}
+        />
+        {/* Score label */}
+        <span
+          className="absolute text-[9px] font-bold"
+          style={{
+            left: `${position}%`,
+            transform: "translateX(-50%)",
+            top: "-16px",
+            color: "var(--muted-foreground)",
+          }}
+        >
+          {dimension.leftScore}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- SAMPLE POST CARD ---------- */
+
+function SamplePostCard({
+  post,
+  gpName,
+  gpTitle,
+  gpColor,
+  typeface,
+}: {
+  post: SamplePost;
+  gpName: string;
+  gpTitle: string;
+  gpColor: string;
+  typeface: string;
+}) {
+  const cfg = statusConfig[post.status] || statusConfig.draft;
+  return (
+    <div
+      className="rounded-xl overflow-hidden"
+      style={{ background: "var(--card)", border: `1px solid ${border}` }}
+    >
+      {/* LinkedIn-style header */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+            style={{
+              background: gpColor,
+              color: gpColor === "#F5F2F0" || gpColor === "#D3B184" ? "#122620" : "#F5F2F0",
+              border: gpColor === "#F5F2F0" ? `1px solid ${border}` : "none",
+            }}
+          >
+            {gpName.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+          </div>
+          <div>
+            <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+              {gpName.split(",")[0]}
+            </p>
+            <p className="text-[11px]" style={{ color: "var(--muted-foreground)" }}>
+              {gpTitle} &middot; {post.format}
+            </p>
+          </div>
+        </div>
+        <Badge variant={cfg.variant}>{cfg.label}</Badge>
+      </div>
+
+      {/* Post title */}
+      <div className="px-5 pb-2">
+        <p
+          className="font-semibold text-sm"
+          style={{
+            fontFamily: typeface,
+            color: "var(--foreground)",
+          }}
+        >
+          {post.title}
+        </p>
+      </div>
+
+      {/* Post body */}
+      <div className="px-5 pb-4">
+        <p
+          className="text-sm leading-relaxed whitespace-pre-line"
+          style={{ color: "var(--foreground)" }}
+        >
+          {post.body}
+        </p>
+      </div>
+
+      {/* Hashtags */}
+      <div className="px-5 pb-3">
+        <div className="flex flex-wrap gap-1">
+          {post.hashtags.map((tag, i) => (
+            <span
+              key={i}
+              className="text-xs"
+              style={{ color: "oklch(0.55 0.10 250)" }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Visual direction note + char count */}
+      <div
+        className="px-5 py-3 flex items-start justify-between gap-4"
+        style={{
+          background: "var(--muted)",
+          borderTop: `1px solid ${border}`,
+        }}
+      >
+        <div>
+          <p className="text-[10px] font-medium uppercase mb-1" style={{ color: "var(--muted-foreground)", letterSpacing: "0.06em" }}>
+            Visual Direction
+          </p>
+          <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+            {post.visualDirectionNote}
+          </p>
+        </div>
+        <span
+          className="text-[10px] font-mono flex-shrink-0 px-2 py-1 rounded"
+          style={{ background: "var(--card)", color: "var(--muted-foreground)", border: `1px solid ${border}` }}
+        >
+          ~{post.charCount} chars
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- COPY BUTTON ---------- */
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [text]);
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="text-[10px] font-mono px-2 py-1 rounded transition-colors"
+      style={{
+        background: copied ? "oklch(0.55 0.18 145 / 0.2)" : "oklch(1 0 0 / 0.08)",
+        color: copied ? "oklch(0.65 0.18 145)" : "oklch(0.60 0.01 200)",
+        border: "1px solid oklch(1 0 0 / 0.1)",
+      }}
+    >
+      {copied ? "Copied" : "Copy"}
+    </button>
+  );
+}
