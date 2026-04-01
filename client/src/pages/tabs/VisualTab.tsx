@@ -89,7 +89,7 @@ export default function VisualTab() {
       <SubTitle>Palette Ratios</SubTitle>
       <DataTable
         headers={["Proportion", "Colors", "Purpose"]}
-        rows={paletteRatios.map((r) => [r.range, r.colors, r.purpose])}
+        rows={paletteRatios.map((r) => [`${r.pct}%`, r.colors, r.purpose])}
       />
 
       {/* Retired color note */}
@@ -153,7 +153,7 @@ export default function VisualTab() {
       <HighlightBlock variant="amber" label="MISSING LOGO ASSETS">
         <ul className="list-disc list-inside space-y-1">
           {logoData.missingAssets.map((a, i) => (
-            <li key={i}>{a}</li>
+            <li key={i}>{typeof a === "string" ? a : a.asset}</li>
           ))}
         </ul>
       </HighlightBlock>
