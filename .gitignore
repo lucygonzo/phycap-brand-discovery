@@ -1,4 +1,6 @@
 node_modules/
 .DS_Store
+dist/
+data/
 scripts/drive-vault/oldtoken.json
 scripts/drive-vault/token.json

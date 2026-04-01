@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+/* ============================================================
+   PHYCAP BRAND HQ — DESIGN SYSTEM
+   Colors: Forest / Gold / Cream / Blue Black / Dark Slate
+   Typography: Marcellus (display) + Roboto (body) + JetBrains Mono (code)
+   ============================================================ */
+
+:root {
+  /* PhyCap Brand Palette */
+  --phycap-forest: oklch(0.20 0.03 163);
+  --phycap-gold: oklch(0.77 0.07 72);
+  --phycap-blue-black: oklch(0.06 0.00 200);
+  --phycap-dark-slate: oklch(0.24 0.03 228);
+  --phycap-cream: oklch(0.96 0.01 60);
+
+  /* Semantic tokens (light mode) */
+  --background: oklch(0.98 0.003 60);
+  --foreground: oklch(0.10 0.02 200);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.10 0.02 200);
+  --muted: oklch(0.94 0.01 60);
+  --muted-foreground: oklch(0.45 0.03 200);
+  --border: oklch(0.90 0.01 60);
+  --primary: var(--phycap-forest);
+  --primary-foreground: oklch(0.98 0.005 60);
+  --accent: var(--phycap-gold);
+  --accent-foreground: oklch(0.15 0.03 60);
+  --destructive: oklch(0.55 0.20 25);
+
+  /* Sidebar (always Forest) */
+  --sidebar: var(--phycap-forest);
+  --sidebar-foreground: oklch(0.95 0.005 60);
+  --sidebar-muted: oklch(0.30 0.03 163);
+  --sidebar-accent: var(--phycap-gold);
+  --sidebar-border: oklch(0.28 0.03 163);
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: oklch(0.14 0.02 200);
+  --foreground: oklch(0.92 0.01 200);
+  --card: oklch(0.18 0.02 200);
+  --card-foreground: oklch(0.92 0.01 200);
+  --muted: oklch(0.22 0.02 200);
+  --muted-foreground: oklch(0.60 0.03 200);
+  --border: oklch(0.28 0.02 200);
+  --primary: var(--phycap-gold);
+  --primary-foreground: var(--phycap-forest);
+  --accent: var(--phycap-gold);
+  --accent-foreground: var(--phycap-forest);
+}
+
+/* Base styles */
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Roboto", "Arial", sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Display font class */
+.display-font {
+  font-family: "Marcellus", "Georgia", serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* Mono font class */
+.mono-font {
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.50 0.02 200 / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.50 0.02 200 / 0.5);
+}
+
+/* Tab content animation */
+.tab-content-enter {
+  animation: tabFadeIn 0.2s ease-out;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Eyebrow label style */
+.eyebrow {
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
